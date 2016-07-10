@@ -19,5 +19,5 @@ upstream [GitHub repository](https://github.com/godotengine/collada-exporter).
 ## License
 
 This Better Collada exporter is distributed under the terms of the GNU General
-Public License, version 3 or later. See the [LICENSE.txt](/LICENSE.txt) file
+Public License, version 2 or later. See the [LICENSE.txt](/LICENSE.txt) file
 for details.
