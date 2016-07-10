@@ -26,17 +26,6 @@ This script is an exporter to the Khronos Collada file format.
 http://www.khronos.org/collada/
 """
 
-# TODO:
-# Materials & Textures
-# Optionally export Vertex Colors
-# Morph Targets
-# Control bone removal
-# Copy textures
-# Export Keyframe Optimization
-# --
-# Morph Targets
-# Blender native material? (?)
-
 import os
 import time
 import math  # math.pi
