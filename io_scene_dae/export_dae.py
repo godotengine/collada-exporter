@@ -191,7 +191,7 @@ class DaeExporter:
                 if img_tmp_path.lower().endswith(bpy.path.extensions_image):
                     image.filepath = os.path.join(basedir, os.path.basename(img_tmp_path))
                 else:
-                    image.filepath = os.path.join(basedir, image.name + ".png")
+                    image.filepath = os.path.join(basedir, "{}.png".format(image.name))
 
                 dstfile = os.path.join(basedir, os.path.basename(image.filepath))
 
