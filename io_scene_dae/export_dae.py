@@ -161,11 +161,12 @@ class DaeExporter:
         self.sections[section].append(line)
 
     def export_image(self, image):
-        if (image in self.image_cache):
-            return self.image_cache[image]
+        img_id = self.image_cache.get(image)
+        if img_id:
+            return img_id
 
         imgpath = image.filepath
-        if (imgpath.find("//") == 0 or imgpath.find("\\\\") == 0):
+        if imgpath.startswith("//"):
             # If relative, convert to absolute
             imgpath = bpy.path.abspath(imgpath)
 
@@ -187,9 +188,7 @@ class DaeExporter:
                 # If file is not found save it as png file in the destination
                 # folder
                 img_tmp_path = image.filepath
-                if img_tmp_path.endswith((".bmp", ".rgb", ".png", ".jpeg",
-                                          ".jpg", ".jp2", ".tga", ".cin",
-                                          ".dpx", ".exr", ".hdr", ".tif")):
+                if img_tmp_path.lower().endswith(bpy.path.extensions_image):
                     image.filepath = basedir + "/" + \
                         os.path.basename(img_tmp_path)
                 else:
@@ -234,8 +233,9 @@ class DaeExporter:
         return imgid
 
     def export_material(self, material, double_sided_hint=True):
-        if (material in self.material_cache):
-            return self.material_cache[material]
+        material_id = self.material_cache.get(material)
+        if material_id:
+            return material_id
 
         fxid = self.new_id("fx")
         self.writel(S_FX, 1, '<effect id="' + fxid + '" name="' +
@@ -1760,9 +1760,9 @@ class DaeExporter:
                 bones = []
                 # find bones used
                 for p in x.fcurves:
-                    dp = str(p.data_path)
+                    dp = p.data_path
                     base = "pose.bones[\""
-                    if (dp.find(base) == 0):
+                    if dp.startswith(base):
                         dp = dp[len(base):]
                         if (dp.find('"') != -1):
                             dp = dp[:dp.find('"')]

@@ -142,13 +142,6 @@ class ExportDAE(bpy.types.Operator, ExportHelper):
         # return self.batch_mode == 'OFF'
         return True
 
-    def check(self, context):
-        return True
-        """
-        isretur_def_change = super().check(context)
-        return (is_xna_change or is_def_change)
-        """
-
     def execute(self, context):
         if not self.filepath:
             raise Exception("filepath not set")
