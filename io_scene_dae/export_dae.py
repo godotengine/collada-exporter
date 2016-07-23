@@ -140,6 +140,9 @@ class DaeExporter:
 
             return tup
 
+        __slots__ = ("vertex", "normal", "tangent", "bitangent", "color", "uv",
+                     "uv2", "bones", "weights")
+
         def __init__(self):
             self.vertex = Vector((0.0, 0.0, 0.0))
             self.normal = Vector((0.0, 0.0, 0.0))
@@ -1884,6 +1887,11 @@ class DaeExporter:
         f.write(bytes('</scene>\n', "UTF-8"))
         f.write(bytes('</COLLADA>\n', "UTF-8"))
         return True
+
+    __slots__ = ("operator", "scene", "last_id", "scene_name", "sections",
+                 "path", "mesh_cache", "curve_cache", "material_cache",
+                 "image_cache", "skeleton_info", "config", "valid_nodes",
+                 "armature_for_morph", "used_bones", "wrongvtx_report")
 
     def __init__(self, path, kwargs, operator):
         self.operator = operator
