@@ -174,31 +174,30 @@ class DaeExporter:
 
         if (self.config["use_copy_images"]):
             # copy image
-            basedir = os.path.dirname(self.path) + "/images"
+            basedir = os.path.join(os.path.dirname(self.path), "images")
             if (not os.path.isdir(basedir)):
                 os.makedirs(basedir)
 
             if os.path.isfile(imgpath):
-                dstfile = basedir + "/" + os.path.basename(imgpath)
+                dstfile = os.path.join(basedir, os.path.basename(imgpath))
 
                 if not os.path.isfile(dstfile):
                     shutil.copy(imgpath, dstfile)
-                imgpath = "images/" + os.path.basename(imgpath)
+                imgpath = os.path.join("images", os.path.basename(imgpath))
             else:
                 # If file is not found save it as png file in the destination
                 # folder
                 img_tmp_path = image.filepath
                 if img_tmp_path.lower().endswith(bpy.path.extensions_image):
-                    image.filepath = basedir + "/" + \
-                        os.path.basename(img_tmp_path)
+                    image.filepath = os.path.join(basedir, os.path.basename(img_tmp_path))
                 else:
-                    image.filepath = basedir + "/" + image.name + ".png"
+                    image.filepath = os.path.join(basedir, "{}.png".format(image.name))
 
-                dstfile = basedir + "/" + os.path.basename(image.filepath)
+                dstfile = os.path.join(basedir, os.path.basename(image.filepath))
 
                 if not os.path.isfile(dstfile):
                     image.save()
-                imgpath = "images/" + os.path.basename(image.filepath)
+                imgpath = os.path.join("images", os.path.basename(image.filepath))
                 image.filepath = img_tmp_path
 
         else:
