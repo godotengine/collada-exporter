@@ -31,7 +31,7 @@ bl_info = {
                     "Otherwise contact the Godot Engine community."),
     "warning": "",
     "wiki_url": ("https://godotengine.org"),
-    "tracker_url": "",
+    "tracker_url": "https://github.com/godotengine/collada-exporter",
     "support": 'OFFICIAL',
     "category": "Import-Export"}
 
