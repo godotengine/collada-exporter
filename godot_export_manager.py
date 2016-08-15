@@ -165,7 +165,7 @@ class add_objects_to_group(bpy.types.Operator):
                     else:
                         objects_str += ", "+object.name
 
-            self.report({'INFO'}, objects_str + " added to group.")
+            self.report({'INFO'}, "{} added to group.".format(objects_str))
             if self.undo:
                 bpy.ops.ed.undo_push(message="Objects added to group")
         else:
@@ -202,7 +202,7 @@ class del_objects_from_group(bpy.types.Operator):
                         objects_str += ", "+object.name
                     j += 1
 
-            self.report({'INFO'}, objects_str + " deleted from group.")
+            self.report({'INFO'}, "{} deleted from group.".format(objects_str))
             bpy.ops.ed.undo_push(message="Objects deleted from group")
         else:
             self.report({'WARNING'}, "There is no group to delete from.")
@@ -338,7 +338,7 @@ class export_group(bpy.types.Operator):
             if group[self.idx].export_name.endswith(".dae"):
                 path = os.path.join(path, group[self.idx].export_name)
             else:
-                path = os.path.join(path, group[self.idx].export_name+".dae")
+                path = os.path.join(path, "{}.dae".format(group[self.idx].export_name))
 
             hide_select = []
             for object in context.scene.objects:
@@ -396,8 +396,8 @@ class export_group(bpy.types.Operator):
                 use_metadata=group[self.idx].use_metadata)
 
             self.report({'INFO'},
-                        '"' + group[self.idx].name + '" Group exported.')
-            msg = "Export Group "+group[self.idx].name
+                        '"{}" Group exported.'.format(group[self.idx].name))
+            msg = "Export Group {}".format(group[self.idx].name)
 
             bpy.ops.ed.undo_push(message="")
             bpy.ops.ed.undo()
