@@ -61,19 +61,18 @@ def snap_tup(tup):
 
 
 def strmtx(mtx):
-    s = " "
+    s = ""
     for x in range(4):
         for y in range(4):
-            s += str(mtx[x][y])
-            s += " "
-    s += " "
+            s += "{} ".format(mtx[x][y])
+    s = " {} ".format(s)
     return s
 
 
 def numarr(a, mult=1.0):
     s = " "
     for x in a:
-        s += " " + str(x * mult)
+        s += " {}".format(x * mult)
     s += " "
     return s
 
@@ -81,7 +80,7 @@ def numarr(a, mult=1.0):
 def numarr_alpha(a, mult=1.0):
     s = " "
     for x in a:
-        s += " " + str(x * mult)
+        s += " {}".format(x * mult)
     if len(a) == 3:
         s += " 1.0"
     s += " "
@@ -91,7 +90,7 @@ def numarr_alpha(a, mult=1.0):
 def strarr(arr):
     s = " "
     for x in arr:
-        s += " " + str(x)
+        s += " {}".format(x)
     s += " "
     return s
 
@@ -105,7 +104,7 @@ class DaeExporter:
 
     def new_id(self, t):
         self.last_id += 1
-        return "id-" + t + "-" + str(self.last_id)
+        return "id-{}-{}".format(t, self.last_id)
 
     class Vertex:
 
@@ -154,10 +153,7 @@ class DaeExporter:
     def writel(self, section, indent, text):
         if (not (section in self.sections)):
             self.sections[section] = []
-        line = ""
-        for x in range(indent):
-            line += "\t"
-        line += text
+        line = "{}{}".format(indent * "\t", text)
         self.sections[section].append(line)
 
     def export_image(self, image):
@@ -189,15 +185,19 @@ class DaeExporter:
                 # folder
                 img_tmp_path = image.filepath
                 if img_tmp_path.lower().endswith(bpy.path.extensions_image):
-                    image.filepath = os.path.join(basedir, os.path.basename(img_tmp_path))
+                    image.filepath =
+                        os.path.join(basedir, os.path.basename(img_tmp_path))
                 else:
-                    image.filepath = os.path.join(basedir, "{}.png".format(image.name))
+                    image.filepath =
+                        os.path.join(basedir, "{}.png".format(image.name))
 
-                dstfile = os.path.join(basedir, os.path.basename(image.filepath))
+                dstfile =
+                    os.path.join(basedir, os.path.basename(image.filepath))
 
                 if not os.path.isfile(dstfile):
                     image.save()
-                imgpath = os.path.join("images", os.path.basename(image.filepath))
+                imgpath =
+                    os.path.join("images", os.path.basename(image.filepath))
                 image.filepath = img_tmp_path
 
         else:
@@ -213,7 +213,7 @@ class DaeExporter:
 
         imgid = self.new_id("image")
 
-        print("FOR: " + imgpath)
+        print("FOR: {}".format(imgpath))
 
 #        if (not os.path.isfile(imgpath)):
 #            print("NOT FILE?")
@@ -570,8 +570,9 @@ class DaeExporter:
                 mesh.calc_tangents()
             except:
                 self.operator.report(
-                    {'WARNING'}, 'CalcTangets failed for mesh "' + mesh.name +
-                    '", no tangets will be exported.')
+                    {"WARNING"},
+                    "CalcTangets failed for mesh \"{}\", no tangets will be "\
+                    "exported.".format(mesh.name))
                 # uv_layer_count=0
                 mesh.calc_normals_split()
                 has_tangents = False
@@ -666,9 +667,10 @@ class DaeExporter:
                     if (wsum == 0.0):
                         if not self.wrongvtx_report:
                             self.operator.report(
-                                {'WARNING'}, 'Mesh for object "' + node.name +
-                                '" has unassigned weights. '
-                                'This may look wrong in exported model.')
+                                {"WARNING"},
+                                "Mesh for object \"{}\" has unassigned " \
+                                "weights. This may look wrong in exported "\
+                                "model.".format(node.name))
                             self.wrongvtx_report = True
 
                         # blender can have bones assigned that weight zero
@@ -703,8 +705,7 @@ class DaeExporter:
         self.writel(S_GEOM, 3, '<source id="' + meshid + '-positions">')
         float_values = ""
         for v in vertices:
-            float_values += " " + str(v.vertex.x) + " " + \
-                str(v.vertex.y) + " " + str(v.vertex.z)
+            float_values += " {} {} {}".format(v.vertex.x, v.vertex.y, v.vertex.z)
         self.writel(S_GEOM, 4, '<float_array id="' + meshid +
                     '-positions-array" count="' +
                     str(len(vertices) * 3) + '">' + float_values +
@@ -725,8 +726,7 @@ class DaeExporter:
         self.writel(S_GEOM, 3, '<source id="' + meshid + '-normals">')
         float_values = ""
         for v in vertices:
-            float_values += " " + str(v.normal.x) + " " + \
-                str(v.normal.y) + " " + str(v.normal.z)
+            float_values += " {} {} {}".format(v.normal.x, v.normal.y, v.normal.z)
         self.writel(S_GEOM, 4, '<float_array id="' + meshid +
                     '-normals-array" count="' +
                     str(len(vertices) * 3) + '">' + float_values +
@@ -746,9 +746,7 @@ class DaeExporter:
             self.writel(S_GEOM, 3, '<source id="' + meshid + '-tangents">')
             float_values = ""
             for v in vertices:
-                float_values += " " + \
-                    str(v.tangent.x) + " " + \
-                    str(v.tangent.y) + " " + str(v.tangent.z)
+                float_values += " {} {} {}".format(v.tangent.x, v.tangent.y, v.tangent.z)
             self.writel(S_GEOM, 4, '<float_array id="' + meshid +
                         '-tangents-array" count="' +
                         str(len(vertices) * 3) + '">' + float_values +
@@ -767,9 +765,7 @@ class DaeExporter:
             self.writel(S_GEOM, 3, '<source id="' + meshid + '-bitangents">')
             float_values = ""
             for v in vertices:
-                float_values += " " + \
-                    str(v.bitangent.x) + " " + \
-                    str(v.bitangent.y) + " " + str(v.bitangent.z)
+                float_values += " {} {} {}".format(v.bitangent.x, v.bitangent.y, v.bitangent.z)
             self.writel(S_GEOM, 4, '<float_array id="' + meshid +
                         '-bitangents-array" count="' +
                         str(len(vertices) * 3) + '">' + float_values +
@@ -794,8 +790,7 @@ class DaeExporter:
             float_values = ""
             for v in vertices:
                 try:
-                    float_values += " " + \
-                        str(v.uv[uvi].x) + " " + str(v.uv[uvi].y)
+                    float_values += " {} {}".format(v.uv[uvi].x, v.uv[uvi].y)
                 except:
                     # I don't understand this weird multi-uv-layer API, but
                     # with this it seems to works
@@ -822,9 +817,7 @@ class DaeExporter:
             self.writel(S_GEOM, 3, '<source id="' + meshid + '-colors">')
             float_values = ""
             for v in vertices:
-                float_values += " " + \
-                    str(v.color.x) + " " + \
-                    str(v.color.y) + " " + str(v.color.z)
+                float_values += " {} {} {}".format(v.color.x, v.color.y, v.color.z)
             self.writel(S_GEOM, 4, '<float_array id="' + meshid +
                         '-colors-array" count="' +
                         str(len(vertices) * 3) + '">' + float_values +
@@ -893,14 +886,14 @@ class DaeExporter:
                 int_values = "<p>"
                 for p in indices:
                     for i in p:
-                        int_values += " " + str(i)
+                        int_values += " {}".format(i)
                 int_values += " </p>"
                 self.writel(S_GEOM, 4, int_values)
             else:
                 for p in indices:
                     int_values = "<p>"
                     for i in p:
-                        int_values += " " + str(i)
+                        int_values += " {}".format(i)
                     int_values += " </p>"
                     self.writel(S_GEOM, 4, int_values)
 
@@ -934,7 +927,7 @@ class DaeExporter:
             self.writel(S_SKIN, 3, '<source id="' + contid + '-joints">')
             name_values = ""
             for v in si["bone_names"]:
-                name_values += " " + v
+                name_values += " {}".format(v)
 
             self.writel(S_SKIN, 4, '<Name_array id="' + contid +
                         '-joints-array" count="' +
@@ -952,7 +945,7 @@ class DaeExporter:
             self.writel(S_SKIN, 3, '<source id="' + contid + '-bind_poses">')
             pose_values = ""
             for v in si["bone_bind_poses"]:
-                pose_values += " " + strmtx(v)
+                pose_values += " {}".format(strmtx(v))
 
             self.writel(S_SKIN, 4, '<float_array id="' + contid +
                         '-bind_poses-array" count="' +
@@ -973,7 +966,7 @@ class DaeExporter:
             for v in vertices:
                 skin_weights_total += len(v.weights)
                 for w in v.weights:
-                    skin_weights += " " + str(w)
+                    skin_weights += " {}".format(w)
 
             self.writel(S_SKIN, 4, '<float_array id="' + contid +
                         '-skin_weights-array" count="' +
@@ -1006,10 +999,9 @@ class DaeExporter:
             vs = ""
             vcount = 0
             for v in vertices:
-                vcounts += " " + str(len(v.weights))
+                vcounts += " {}".format(len(v.weights))
                 for b in v.bones:
-                    vs += " " + str(b)
-                    vs += " " + str(vcount)
+                    vs += " {} {}".format(b, vcount)
                     vcount += 1
             self.writel(S_SKIN, 4, '<vcount>' + vcounts + '</vcount>')
             self.writel(S_SKIN, 4, '<v>' + vs + '</v>')
@@ -1035,18 +1027,17 @@ class DaeExporter:
             if (node.parent.type == "ARMATURE"):
                 armature = node.parent
                 if (armcount > 1):
-                    self.operator.report({'WARNING'}, 'Object "' + node.name +
-                                         '" refers to more than one armature! '
-                                         'This is unsupported.')
+                    self.operator.report({"WARNING"}, "Object \"{}\" refers "\
+                    "to more than one armature! "\
+                    "This is unsupported.".format(node.name))
                 if (armcount == 0):
-                    self.operator.report({'WARNING'}, 'Object "' + node.name +
-                                         '" is child of an armature, but has '
-                                         'no armature modifier.')
+                    self.operator.report({"WARNING"}, "Object \"{}\" is child "\
+                    "of an armature, but has no armature modifier.".format(node.name))
 
         if (armcount > 0 and not armature):
-            self.operator.report({'WARNING'}, 'Object "' + node.name +
-                                 '" has armature modifier, but is not a child '
-                                 'of an armature. This is unsupported.')
+            self.operator.report({"WARNING"},
+            "Object \"{}\" has armature modifier, but is not a child of an "\
+            "armature. This is unsupported.".format(node.name))
 
         if (node.data.shape_keys is not None):
             sk = node.data.shape_keys
@@ -1102,12 +1093,12 @@ class DaeExporter:
         boneid = self.new_id("bone")
         boneidx = si["bone_count"]
         si["bone_count"] += 1
-        bonesid = si["id"] + "-" + str(boneidx)
+        bonesid = "{}-{}".format(si["id"], boneidx)
         if (bone.name in self.used_bones):
             if (self.config["use_anim_action_all"]):
-                self.operator.report({'WARNING'}, 'Bone name "' + bone.name +
-                                     '" used in more than one skeleton. '
-                                     'Actions might export wrong.')
+                self.operator.report({"WARNING"},
+                "Bone name \"{}\" used in more than one skeleton. "\
+                "Actions might export wrong.".format(bone.name))
         else:
             self.used_bones.append(bone.name)
 
@@ -1142,10 +1133,14 @@ class DaeExporter:
         self.skeleton_info[node] = {
             "bone_count": 0,
             "id": self.new_id("skelbones"),
-            "name": node.name, "bone_index": {},
-            "bone_ids": {}, "bone_names": [], "bone_bind_poses": [],
+            "name": node.name,
+            "bone_index": {},
+            "bone_ids": {},
+            "bone_names": [],
+            "bone_bind_poses": [],
             "skeleton_nodes": [],
-            "armature_xform": node.matrix_world}
+            "armature_xform": node.matrix_world
+        }
 
         for b in armature.bones:
             if (b.parent is not None):
@@ -1155,7 +1150,7 @@ class DaeExporter:
         if (node.pose):
             for b in node.pose.bones:
                 for x in b.constraints:
-                    if (x.type == 'ACTION'):
+                    if (x.type == "ACTION"):
                         self.action_constraints.append(x.action)
 
     def export_camera_node(self, node, il):
@@ -1307,7 +1302,7 @@ class DaeExporter:
         self.writel(S_GEOM, 3, '<source id="' + splineid + '-positions">')
         position_values = ""
         for x in points:
-            position_values += " " + str(x)
+            position_values += " {}".format(x)
         self.writel(S_GEOM, 4, '<float_array id="' + splineid +
                     '-positions-array" count="' +
                     str(len(points)) + '">' + position_values +
@@ -1325,7 +1320,7 @@ class DaeExporter:
         self.writel(S_GEOM, 3, '<source id="' + splineid + '-intangents">')
         intangent_values = ""
         for x in handles_in:
-            intangent_values += " " + str(x)
+            intangent_values += " {}".format(x)
         self.writel(S_GEOM, 4, '<float_array id="' + splineid +
                     '-intangents-array" count="' +
                     str(len(points)) + '">' + intangent_values +
@@ -1343,7 +1338,7 @@ class DaeExporter:
         self.writel(S_GEOM, 3, '<source id="' + splineid + '-outtangents">')
         outtangent_values = ""
         for x in handles_out:
-            outtangent_values += " " + str(x)
+            outtangent_values += " {}".format(x)
         self.writel(S_GEOM, 4, '<float_array id="' + splineid +
                     '-outtangents-array" count="' +
                     str(len(points)) + '">' + outtangent_values +
@@ -1361,7 +1356,7 @@ class DaeExporter:
         self.writel(S_GEOM, 3, '<source id="' + splineid + '-interpolations">')
         interpolation_values = ""
         for x in interps:
-            interpolation_values += " " + x
+            interpolation_values += " {}".format(x)
         self.writel(S_GEOM, 4, '<Name_array id="' + splineid +
                     '-interpolations-array" count="' +
                     str(len(interps)) + '">' + interpolation_values +
@@ -1377,7 +1372,7 @@ class DaeExporter:
         self.writel(S_GEOM, 3, '<source id="' + splineid + '-tilts">')
         tilt_values = ""
         for x in tilts:
-            tilt_values += " " + str(x)
+            tilt_values += " {}".format(x)
         self.writel(S_GEOM, 4, '<float_array id="' + splineid +
                     '-tilts-array" count="' +
                     str(len(tilts)) + '">' + tilt_values + '</float_array>')
@@ -1522,11 +1517,11 @@ class DaeExporter:
         source_interps = ""
 
         for k in keys:
-            source_frames += " " + str(k[0])
+            source_frames += " {}".format(k[0])
             if (matrices):
-                source_transforms += " " + strmtx(k[1])
+                source_transforms += " {}".format(strmtx(k[1]))
             else:
-                source_transforms += " " + str(k[1])
+                source_transforms += " {}".format(k[1])
 
             source_interps += " LINEAR"
 
@@ -1660,7 +1655,7 @@ class DaeExporter:
                         if (i == 0):
                             continue
 
-                        name = target + "-morph-weights(" + str(i - 1) + ")"
+                        name = "{}-morph-weights({})".format(target, i - 1)
                         if (not (name in blend_cache)):
                             blend_cache[name] = []
 
@@ -1800,8 +1795,8 @@ class DaeExporter:
                 self.writel(S_ANIM_CLIPS, 1, '</animation_clip>')
                 if (len(tcn) == 0):
                     self.operator.report(
-                        {'WARNING'}, 'Animation clip "' + x.name +
-                        '" contains no tracks.')
+                        {"WARNING"}, "Animation clip \"{}\" contains no "\
+                        "tracks.".format(x.name))
 
             self.writel(S_ANIM_CLIPS, 0, '</library_animation_clips>')
 
