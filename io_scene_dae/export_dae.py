@@ -1910,4 +1910,4 @@ def save(operator, context, filepath="", use_selection=False, **kwargs):
     exp = DaeExporter(filepath, kwargs, operator)
     exp.export()
 
-    return {'FINISHED'}  # so the script wont run after we have batch exported.
+    return {"FINISHED"}  # so the script wont run after we have batch exported.

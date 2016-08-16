@@ -32,7 +32,7 @@ bl_info = {
     "warning": "",
     "wiki_url": ("https://godotengine.org"),
     "tracker_url": "https://github.com/godotengine/collada-exporter",
-    "support": 'OFFICIAL',
+    "support": "OFFICIAL",
     "category": "Import-Export"}
 
 if "bpy" in locals():
@@ -42,28 +42,28 @@ if "bpy" in locals():
 
 
 class ExportDAE(bpy.types.Operator, ExportHelper):
-    '''Selection to DAE'''
+    """Selection to DAE"""
     bl_idname = "export_scene.dae"
     bl_label = "Export DAE"
-    bl_options = {'PRESET'}
+    bl_options = {"PRESET"}
 
     filename_ext = ".dae"
-    filter_glob = StringProperty(default="*.dae", options={'HIDDEN'})
+    filter_glob = StringProperty(default="*.dae", options={"HIDDEN"})
 
     # List of operator properties, the attributes will be assigned
     # to the class instance from the operator settings before calling.
 
     object_types = EnumProperty(
         name="Object Types",
-        options={'ENUM_FLAG'},
-        items=(('EMPTY', "Empty", ""),
-               ('CAMERA', "Camera", ""),
-               ('LAMP', "Lamp", ""),
-               ('ARMATURE', "Armature", ""),
-               ('MESH', "Mesh", ""),
-               ('CURVE', "Curve", ""),
+        options={"ENUM_FLAG"},
+        items=(("EMPTY", "Empty", ""),
+               ("CAMERA", "Camera", ""),
+               ("LAMP", "Lamp", ""),
+               ("ARMATURE", "Armature", ""),
+               ("MESH", "Mesh", ""),
+               ("CURVE", "Curve", ""),
                ),
-        default={'EMPTY', 'CAMERA', 'LAMP', 'ARMATURE', 'MESH', 'CURVE'},
+        default={"EMPTY", "CAMERA", "LAMP", "ARMATURE", "MESH", "CURVE"},
         )
 
     use_export_selected = BoolProperty(
@@ -134,12 +134,12 @@ class ExportDAE(bpy.types.Operator, ExportHelper):
     use_metadata = BoolProperty(
         name="Use Metadata",
         default=True,
-        options={'HIDDEN'},
+        options={"HIDDEN"},
         )
 
     @property
     def check_extension(self):
-        # return self.batch_mode == 'OFF'
+        # return self.batch_mode == "OFF"
         return True
 
     def execute(self, context):
