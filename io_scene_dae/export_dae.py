@@ -188,19 +188,15 @@ class DaeExporter:
                 # folder
                 img_tmp_path = image.filepath
                 if img_tmp_path.lower().endswith(bpy.path.extensions_image):
-                    image.filepath =
-                        os.path.join(basedir, os.path.basename(img_tmp_path))
+                    image.filepath = os.path.join(basedir, os.path.basename(img_tmp_path))
                 else:
-                    image.filepath =
-                        os.path.join(basedir, "{}.png".format(image.name))
+                    image.filepath = os.path.join(basedir, "{}.png".format(image.name))
 
-                dstfile =
-                    os.path.join(basedir, os.path.basename(image.filepath))
+                dstfile = os.path.join(basedir, os.path.basename(image.filepath))
 
                 if not os.path.isfile(dstfile):
                     image.save()
-                imgpath =
-                    os.path.join("images", os.path.basename(image.filepath))
+                imgpath = os.path.join("images", os.path.basename(image.filepath))
                 image.filepath = img_tmp_path
 
         else:
@@ -1885,7 +1881,8 @@ class DaeExporter:
     __slots__ = ("operator", "scene", "last_id", "scene_name", "sections",
                  "path", "mesh_cache", "curve_cache", "material_cache",
                  "image_cache", "skeleton_info", "config", "valid_nodes",
-                 "armature_for_morph", "used_bones", "wrongvtx_report")
+                 "armature_for_morph", "used_bones", "wrongvtx_report",
+                 "skeletons", "action_constraints")
 
     def __init__(self, path, kwargs, operator):
         self.operator = operator
@@ -1904,6 +1901,8 @@ class DaeExporter:
         self.armature_for_morph = {}
         self.used_bones = []
         self.wrongvtx_report = False
+        self.skeletons = []
+        self.action_constraints = []
 
 
 def save(operator, context, filepath="", use_selection=False, **kwargs):
