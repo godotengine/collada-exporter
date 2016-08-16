@@ -188,22 +188,27 @@ class DaeExporter:
                 # folder
                 img_tmp_path = image.filepath
                 if img_tmp_path.lower().endswith(bpy.path.extensions_image):
-                    image.filepath = os.path.join(basedir, os.path.basename(img_tmp_path))
+                    image.filepath = os.path.join(
+                        basedir, os.path.basename(img_tmp_path))
                 else:
-                    image.filepath = os.path.join(basedir, "{}.png".format(image.name))
+                    image.filepath = os.path.join(
+                        basedir, "{}.png".format(image.name))
 
-                dstfile = os.path.join(basedir, os.path.basename(image.filepath))
+                dstfile = os.path.join(
+                    basedir, os.path.basename(image.filepath))
 
                 if not os.path.isfile(dstfile):
                     image.save()
-                imgpath = os.path.join("images", os.path.basename(image.filepath))
+                imgpath = os.path.join(
+                    "images", os.path.basename(image.filepath))
                 image.filepath = img_tmp_path
 
         else:
             # Export relative, always, no one wants absolute paths.
             try:
                 # Export unix compatible always
-                imgpath = os.path.relpath(imgpath, os.path.dirname(self.path)).replace("\\", "/")
+                imgpath = os.path.relpath(
+                    imgpath, os.path.dirname(self.path)).replace("\\", "/")
 
             except:
                 # Fails sometimes, not sure why
@@ -222,7 +227,8 @@ class DaeExporter:
 #            else:
 #                imgpath="images/"+image.name+".png"
 
-        self.writel(S_IMGS, 1, "<image id=\"{}\" name=\"{}\">".format(imgid, image.name))
+        self.writel(S_IMGS, 1, "<image id=\"{}\" name=\"{}\">".format(
+            imgid, image.name))
         self.writel(S_IMGS, 2, "<init_from>{}</init_from>".format(imgpath))
         self.writel(S_IMGS, 1, "</image>")
         self.image_cache[image] = imgid
@@ -234,7 +240,8 @@ class DaeExporter:
             return material_id
 
         fxid = self.new_id("fx")
-        self.writel(S_FX, 1, "<effect id=\"{}\" name=\"{}-fx\">".format(fxid, material.name))
+        self.writel(S_FX, 1, "<effect id=\"{}\" name=\"{}-fx\">".format(
+            fxid, material.name))
         self.writel(S_FX, 2, "<profile_COMMON>")
 
         # Find and fetch the textures and create sources
@@ -294,36 +301,48 @@ class DaeExporter:
 
         self.writel(S_FX, 5, '<emission>')
         if emission_tex is not None:
-            self.writel(S_FX, 6, '<texture texture="{}" texcoord="CHANNEL1"/>'.format(emission_tex))
+            self.writel(
+                S_FX, 6, '<texture texture="{}" texcoord="CHANNEL1"/>'.format(
+                    emission_tex))
         else:
-            self.writel(S_FX, 6, '<color>{} </color>'.format(numarr_alpha(material.diffuse_color, material.emit)))  # not totally right but good enough
+            # not totally right but good enough
+            self.writel(S_FX, 6, '<color>{} </color>'.format(
+                numarr_alpha(material.diffuse_color, material.emit)))
         self.writel(S_FX, 5, '</emission>')
 
         self.writel(S_FX, 5, '<ambient>')
-        self.writel(S_FX, 6, '<color>{} </color>'.format(numarr_alpha(self.scene.world.ambient_color, material.ambient)))
+        self.writel(S_FX, 6, '<color>{} </color>'.format(
+            numarr_alpha(self.scene.world.ambient_color, material.ambient)))
         self.writel(S_FX, 5, '</ambient>')
 
         self.writel(S_FX, 5, '<diffuse>')
         if diffuse_tex is not None:
-            self.writel(S_FX, 6, '<texture texture="{}" texcoord="CHANNEL1"/>'.format(diffuse_tex))
+            self.writel(
+                S_FX, 6, '<texture texture="{}" texcoord="CHANNEL1"/>'.format(
+                    diffuse_tex))
         else:
-            self.writel(S_FX, 6,
-                        '<color>{}</color>'.format(numarr_alpha(material.diffuse_color, material.diffuse_intensity)))
+            self.writel(S_FX, 6, '<color>{}</color>'.format(numarr_alpha(
+                material.diffuse_color, material.diffuse_intensity)))
         self.writel(S_FX, 5, '</diffuse>')
 
         self.writel(S_FX, 5, '<specular>')
         if specular_tex is not None:
-            self.writel(S_FX, 6, '<texture texture="{}" texcoord="CHANNEL1"/>'.format(specular_tex))
+            self.writel(
+                S_FX, 6, '<texture texture="{}" texcoord="CHANNEL1"/>'.format(
+                    specular_tex))
         else:
-            self.writel(S_FX, 6, '<color>{}</color>'.format(numarr_alpha(material.specular_color, material.specular_intensity)))
+            self.writel(S_FX, 6, '<color>{}</color>'.format(numarr_alpha(
+                material.specular_color, material.specular_intensity)))
         self.writel(S_FX, 5, '</specular>')
 
         self.writel(S_FX, 5, '<shininess>')
-        self.writel(S_FX, 6, '<float>{}</float>'.format(material.specular_hardness))
+        self.writel(S_FX, 6, '<float>{}</float>'.format(
+            material.specular_hardness))
         self.writel(S_FX, 5, '</shininess>')
 
         self.writel(S_FX, 5, '<reflective>')
-        self.writel(S_FX, 6, '<color>{}</color>'.format(numarr_alpha(material.mirror_color)))
+        self.writel(S_FX, 6, '<color>{}</color>'.format(
+            numarr_alpha(material.mirror_color)))
         self.writel(S_FX, 5, '</reflective>')
 
         if (material.use_transparency):
@@ -341,12 +360,15 @@ class DaeExporter:
         self.writel(S_FX, 5, '<technique profile="FCOLLADA">')
         if (normal_tex):
             self.writel(S_FX, 6, '<bump bumptype="NORMALMAP">')
-            self.writel(S_FX, 7, '<texture texture="{}" texcoord="CHANNEL1"/>'.format(normal_tex))
+            self.writel(
+                S_FX, 7, '<texture texture="{}" texcoord="CHANNEL1"/>'.format(
+                    normal_tex))
             self.writel(S_FX, 6, '</bump>')
 
         self.writel(S_FX, 5, '</technique>')
         self.writel(S_FX, 5, '<technique profile="GOOGLEEARTH">')
-        self.writel(S_FX, 6, "<double_sided>{}</double_sided>".format(["0", "1"][double_sided_hint]))
+        self.writel(S_FX, 6, "<double_sided>{}</double_sided>".format(
+            ["0", "1"][double_sided_hint]))
         self.writel(S_FX, 5, '</technique>')
 
         if (material.use_shadeless):
@@ -364,7 +386,8 @@ class DaeExporter:
 
         # Material
         matid = self.new_id("material")
-        self.writel(S_MATS, 1, '<material id="{}" name="{}">'.format(matid, material.name))
+        self.writel(S_MATS, 1, '<material id="{}" name="{}">'.format(
+            matid, material.name))
         self.writel(S_MATS, 2, '<instance_effect url="#{}"/>'.format(fxid))
         self.writel(S_MATS, 1, '</material>')
 
@@ -428,10 +451,16 @@ class DaeExporter:
             #    self.writel(S_MORPH, 2, '<morph source="#'+morph_targets[0][
             #    "skin_id"]+'" method="NORMALIZED">')
             # else:
-            self.writel(S_MORPH, 2, '<morph source="#{}" method="NORMALIZED">'.format(morph_targets[0]["id"]))
+            self.writel(
+                S_MORPH, 2, '<morph source="#{}" method="NORMALIZED">'.format(
+                    morph_targets[0]["id"]))
 
-            self.writel(S_MORPH, 3, '<source id="{}-morph-targets">'.format(mid))
-            self.writel(S_MORPH, 4, '<IDREF_array id="{}-morph-targets-array" count="{}">'.format(mid, len(morph_targets) - 1))
+            self.writel(
+                S_MORPH, 3, '<source id="{}-morph-targets">'.format(mid))
+            self.writel(
+                S_MORPH, 4,
+                '<IDREF_array id="{}-morph-targets-array" count="{}">'.format(
+                    mid, len(morph_targets) - 1))
             marr = ""
             warr = ""
             for i in range(len(morph_targets)):
@@ -450,19 +479,28 @@ class DaeExporter:
             self.writel(S_MORPH, 5, marr)
             self.writel(S_MORPH, 4, '</IDREF_array>')
             self.writel(S_MORPH, 4, '<technique_common>')
-            self.writel(S_MORPH, 5, '<accessor source="#{}-morph-targets-array" count="{}" stride="1">'.format(mid, len(morph_targets) - 1))
+            self.writel(
+                S_MORPH, 5, '<accessor source="#{}-morph-targets-array" '
+                'count="{}" stride="1">'.format(mid, len(morph_targets) - 1))
             self.writel(
                 S_MORPH, 6, '<param name="MORPH_TARGET" type="IDREF"/>')
             self.writel(S_MORPH, 5, '</accessor>')
             self.writel(S_MORPH, 4, '</technique_common>')
             self.writel(S_MORPH, 3, '</source>')
 
-            self.writel(S_MORPH, 3, '<source id="{}-morph-weights">'.format(mid))
-            self.writel(S_MORPH, 4, '<float_array id="{}-morph-weights-array" count="{}" >'.format(mid, len(morph_targets) - 1))
+            self.writel(
+                S_MORPH, 3, '<source id="{}-morph-weights">'.format(mid))
+            self.writel(
+                S_MORPH, 4,
+                '<float_array id="{}-morph-weights-array" count="{}" >'.format(
+                    mid, len(morph_targets) - 1))
             self.writel(S_MORPH, 5, warr)
             self.writel(S_MORPH, 4, '</float_array>')
             self.writel(S_MORPH, 4, '<technique_common>')
-            self.writel(S_MORPH, 5, '<accessor source="#{}-morph-weights-array" count="{}" stride="1">'.format(mid, len(morph_targets) - 1))
+            self.writel(
+                S_MORPH, 5,
+                '<accessor source="#{}-morph-weights-array" '
+                'count="{}" stride="1">'.format(mid, len(morph_targets) - 1))
             self.writel(
                 S_MORPH, 6, '<param name="MORPH_WEIGHT" type="float"/>')
             self.writel(S_MORPH, 5, '</accessor>')
@@ -471,9 +509,11 @@ class DaeExporter:
 
             self.writel(S_MORPH, 3, '<targets>')
             self.writel(
-                S_MORPH, 4, '<input semantic="MORPH_TARGET" source="#{}-morph-targets"/>'.format(mid))
+                S_MORPH, 4, '<input semantic="MORPH_TARGET" '
+                'source="#{}-morph-targets"/>'.format(mid))
             self.writel(
-                S_MORPH, 4, '<input semantic="MORPH_WEIGHT" source="#{}-morph-weights"/>'.format(mid))
+                S_MORPH, 4, '<input semantic="MORPH_WEIGHT" '
+                'source="#{}-morph-weights"/>'.format(mid))
             self.writel(S_MORPH, 3, '</targets>')
             self.writel(S_MORPH, 2, '</morph>')
             self.writel(S_MORPH, 1, '</controller>')
@@ -539,7 +579,7 @@ class DaeExporter:
             except:
                 self.operator.report(
                     {"WARNING"},
-                    "CalcTangets failed for mesh \"{}\", no tangets will be "\
+                    "CalcTangets failed for mesh \"{}\", no tangets will be "
                     "exported.".format(mesh.name))
                 # uv_layer_count=0
                 mesh.calc_normals_split()
@@ -636,8 +676,8 @@ class DaeExporter:
                         if not self.wrongvtx_report:
                             self.operator.report(
                                 {"WARNING"},
-                                "Mesh for object \"{}\" has unassigned " \
-                                "weights. This may look wrong in exported "\
+                                "Mesh for object \"{}\" has unassigned "
+                                "weights. This may look wrong in exported "
                                 "model.".format(node.name))
                             self.wrongvtx_report = True
 
@@ -664,7 +704,9 @@ class DaeExporter:
                 indices.append(vi)
 
         meshid = self.new_id("mesh")
-        self.writel(S_GEOM, 1, '<geometry id="{}" name="{}">'.format(meshid, name_to_use))
+        self.writel(
+            S_GEOM, 1, '<geometry id="{}" name="{}">'.format(
+                meshid, name_to_use))
 
         self.writel(S_GEOM, 2, '<mesh>')
 
@@ -672,10 +714,16 @@ class DaeExporter:
         self.writel(S_GEOM, 3, '<source id="{}-positions">'.format(meshid))
         float_values = ""
         for v in vertices:
-            float_values += " {} {} {}".format(v.vertex.x, v.vertex.y, v.vertex.z)
-        self.writel(S_GEOM, 4, '<float_array id="{}-positions-array" count="{}">{}</float_array>'.format(meshid, len(vertices) * 3, float_values))
+            float_values += " {} {} {}".format(
+                v.vertex.x, v.vertex.y, v.vertex.z)
+        self.writel(
+            S_GEOM, 4, '<float_array id="{}-positions-array" '
+            'count="{}">{}</float_array>'.format(
+                meshid, len(vertices) * 3, float_values))
         self.writel(S_GEOM, 4, '<technique_common>')
-        self.writel(S_GEOM, 4, '<accessor source="#{}-positions-array" count="{}" stride="3">'.format(meshid, len(vertices)))
+        self.writel(
+            S_GEOM, 4, '<accessor source="#{}-positions-array" '
+            'count="{}" stride="3">'.format(meshid, len(vertices)))
         self.writel(S_GEOM, 5, '<param name="X" type="float"/>')
         self.writel(S_GEOM, 5, '<param name="Y" type="float"/>')
         self.writel(S_GEOM, 5, '<param name="Z" type="float"/>')
@@ -688,10 +736,16 @@ class DaeExporter:
         self.writel(S_GEOM, 3, '<source id="{}-normals">'.format(meshid))
         float_values = ""
         for v in vertices:
-            float_values += " {} {} {}".format(v.normal.x, v.normal.y, v.normal.z)
-        self.writel(S_GEOM, 4, '<float_array id="{}-normals-array" count="{}">{}</float_array>'.format(meshid, len(vertices) * 3, float_values))
+            float_values += " {} {} {}".format(
+                v.normal.x, v.normal.y, v.normal.z)
+        self.writel(
+            S_GEOM, 4, '<float_array id="{}-normals-array" '
+            'count="{}">{}</float_array>'.format(
+                meshid, len(vertices) * 3, float_values))
         self.writel(S_GEOM, 4, '<technique_common>')
-        self.writel(S_GEOM, 4, '<accessor source="#{}-normals-array" count="{}" stride="3">'.format(meshid, len(vertices)))
+        self.writel(
+            S_GEOM, 4, '<accessor source="#{}-normals-array" count="{}" '
+            'stride="3">'.format(meshid, len(vertices)))
         self.writel(S_GEOM, 5, '<param name="X" type="float"/>')
         self.writel(S_GEOM, 5, '<param name="Y" type="float"/>')
         self.writel(S_GEOM, 5, '<param name="Z" type="float"/>')
@@ -703,10 +757,16 @@ class DaeExporter:
             self.writel(S_GEOM, 3, '<source id="{}-tangents">'.format(meshid))
             float_values = ""
             for v in vertices:
-                float_values += " {} {} {}".format(v.tangent.x, v.tangent.y, v.tangent.z)
-            self.writel(S_GEOM, 4, '<float_array id="{}-tangents-array" count="{}">{}</float_array>'.format(meshid, len(vertices) * 3, float_values))
+                float_values += " {} {} {}".format(
+                    v.tangent.x, v.tangent.y, v.tangent.z)
+            self.writel(
+                S_GEOM, 4, '<float_array id="{}-tangents-array" '
+                'count="{}">{}</float_array>'.format(
+                    meshid, len(vertices) * 3, float_values))
             self.writel(S_GEOM, 4, '<technique_common>')
-            self.writel(S_GEOM, 4, '<accessor source="#{}-tangents-array" count="{}" stride="3">'.format(meshid, len(vertices)))
+            self.writel(
+                S_GEOM, 4, '<accessor source="#{}-tangents-array" '
+                'count="{}" stride="3">'.format(meshid, len(vertices)))
             self.writel(S_GEOM, 5, '<param name="X" type="float"/>')
             self.writel(S_GEOM, 5, '<param name="Y" type="float"/>')
             self.writel(S_GEOM, 5, '<param name="Z" type="float"/>')
@@ -714,13 +774,20 @@ class DaeExporter:
             self.writel(S_GEOM, 4, '</technique_common>')
             self.writel(S_GEOM, 3, '</source>')
 
-            self.writel(S_GEOM, 3, '<source id="{}-bitangents">'.format(meshid))
+            self.writel(S_GEOM, 3, '<source id="{}-bitangents">'.format(
+                meshid))
             float_values = ""
             for v in vertices:
-                float_values += " {} {} {}".format(v.bitangent.x, v.bitangent.y, v.bitangent.z)
-            self.writel(S_GEOM, 4, '<float_array id="{}-bitangents-array" count="{}">{}</float_array>'.format(meshid, len(vertices) * 3, float_values))
+                float_values += " {} {} {}".format(
+                    v.bitangent.x, v.bitangent.y, v.bitangent.z)
+            self.writel(
+                S_GEOM, 4, '<float_array id="{}-bitangents-array" '
+                'count="{}">{}</float_array>'.format(
+                    meshid, len(vertices) * 3, float_values))
             self.writel(S_GEOM, 4, '<technique_common>')
-            self.writel(S_GEOM, 4, '<accessor source="#{}-bitangents-array" count="{}" stride="3">'.format(meshid, len(vertices)))
+            self.writel(
+                S_GEOM, 4, '<accessor source="#{}-bitangents-array" '
+                'count="{}" stride="3">'.format(meshid, len(vertices)))
             self.writel(S_GEOM, 5, '<param name="X" type="float"/>')
             self.writel(S_GEOM, 5, '<param name="Y" type="float"/>')
             self.writel(S_GEOM, 5, '<param name="Z" type="float"/>')
@@ -732,7 +799,8 @@ class DaeExporter:
 
         for uvi in range(uv_layer_count):
 
-            self.writel(S_GEOM, 3, '<source id="{}-texcoord-{}">'.format(meshid, uvi))
+            self.writel(S_GEOM, 3, '<source id="{}-texcoord-{}">'.format(
+                meshid, uvi))
             float_values = ""
             for v in vertices:
                 try:
@@ -742,9 +810,14 @@ class DaeExporter:
                     # with this it seems to works
                     float_values += " 0 0 "
 
-            self.writel(S_GEOM, 4, '<float_array id="{}-texcoord-{}-array" count="{}">{}</float_array>'.format(meshid, uvi, len(vertices) * 2, float_values))
+            self.writel(
+                S_GEOM, 4, '<float_array id="{}-texcoord-{}-array" '
+                'count="{}">{}</float_array>'.format(
+                    meshid, uvi, len(vertices) * 2, float_values))
             self.writel(S_GEOM, 4, '<technique_common>')
-            self.writel(S_GEOM, 4, '<accessor source="#{}-texcoord-{}-array" count="{}" stride="2">'.format(meshid, uvi, len(vertices)))
+            self.writel(
+                S_GEOM, 4, '<accessor source="#{}-texcoord-{}-array" '
+                'count="{}" stride="2">'.format(meshid, uvi, len(vertices)))
             self.writel(S_GEOM, 5, '<param name="S" type="float"/>')
             self.writel(S_GEOM, 5, '<param name="T" type="float"/>')
             self.writel(S_GEOM, 4, '</accessor>')
@@ -757,10 +830,16 @@ class DaeExporter:
             self.writel(S_GEOM, 3, '<source id="{}-colors">'.format(meshid))
             float_values = ""
             for v in vertices:
-                float_values += " {} {} {}".format(v.color.x, v.color.y, v.color.z)
-            self.writel(S_GEOM, 4, '<float_array id="{}-colors-array" count="{}">{}</float_array>'.format(meshid, len(vertices) * 3, float_values))
+                float_values += " {} {} {}".format(
+                    v.color.x, v.color.y, v.color.z)
+            self.writel(
+                S_GEOM, 4, '<float_array id="{}-colors-array" '
+                'count="{}">{}</float_array>'.format(
+                    meshid, len(vertices) * 3, float_values))
             self.writel(S_GEOM, 4, '<technique_common>')
-            self.writel(S_GEOM, 4, '<accessor source="#{}-colors-array" count="{}" stride="3">'.format(meshid, len(vertices)))
+            self.writel(
+                S_GEOM, 4, '<accessor source="#{}-colors-array" '
+                'count="{}" stride="3">'.format(meshid, len(vertices)))
             self.writel(S_GEOM, 5, '<param name="X" type="float"/>')
             self.writel(S_GEOM, 5, '<param name="Y" type="float"/>')
             self.writel(S_GEOM, 5, '<param name="Z" type="float"/>')
@@ -771,7 +850,9 @@ class DaeExporter:
         # Triangle Lists
         self.writel(S_GEOM, 3, '<vertices id="{}-vertices">'.format(meshid))
         self.writel(
-            S_GEOM, 4, '<input semantic="POSITION" source="#{}-positions"/>'.format(meshid))
+            S_GEOM, 4,
+            '<input semantic="POSITION" source="#{}-positions"/>'.format(
+                meshid))
         self.writel(S_GEOM, 3, '</vertices>')
 
         prim_type = ""
@@ -786,24 +867,37 @@ class DaeExporter:
 
             if (mat is not None):
                 matref = self.new_id("trimat")
-                self.writel(S_GEOM, 3, '<{} count="{}" material="{}">'.format(prim_type, int(len(indices)), matref))  # todo material
+                self.writel(S_GEOM, 3, '<{} count="{}" material="{}">'.format(
+                    prim_type, int(len(indices)), matref))  # todo material
                 mat_assign.append((mat, matref))
             else:
-                self.writel(S_GEOM, 3, '<{} count="{}">'.format(prim_type, int(len(indices))))  # todo material
+                self.writel(S_GEOM, 3, '<{} count="{}">'.format(
+                    prim_type, int(len(indices))))  # todo material
 
-            self.writel(S_GEOM, 4, '<input semantic="VERTEX" source="#{}-vertices" offset="0"/>'.format(meshid))
-            self.writel(S_GEOM, 4, '<input semantic="NORMAL" source="#{}-normals" offset="0"/>'.format(meshid))
+            self.writel(
+                S_GEOM, 4, '<input semantic="VERTEX" '
+                'source="#{}-vertices" offset="0"/>'.format(meshid))
+            self.writel(
+                S_GEOM, 4, '<input semantic="NORMAL" '
+                'source="#{}-normals" offset="0"/>'.format(meshid))
 
             for uvi in range(uv_layer_count):
-                self.writel(S_GEOM, 4, '<input semantic="TEXCOORD" source="#{}-texcoord-{}" offset="0" set="{}"/>'.format(meshid, uvi, uvi))
+                self.writel(
+                    S_GEOM, 4,
+                    '<input semantic="TEXCOORD" source="#{}-texcoord-{}" '
+                    'offset="0" set="{}"/>'.format(meshid, uvi, uvi))
 
             if (has_colors):
-                self.writel(S_GEOM, 4, '<input semantic="COLOR" source="#{}-colors" offset="0"/>'.format(meshid))
+                self.writel(
+                    S_GEOM, 4, '<input semantic="COLOR" '
+                    'source="#{}-colors" offset="0"/>'.format(meshid))
             if (has_tangents):
-                self.writel(S_GEOM, 4,
-                            '<input semantic="TEXTANGENT" source="#{}-tangents" offset="0"/>'.format(meshid))
-                self.writel(S_GEOM, 4,
-                            '<input semantic="TEXBINORMAL" source="#{}-bitangents" offset="0"/>'.format(meshid))
+                self.writel(
+                    S_GEOM, 4, '<input semantic="TEXTANGENT" '
+                    'source="#{}-tangents" offset="0"/>'.format(meshid))
+                self.writel(
+                    S_GEOM, 4, '<input semantic="TEXBINORMAL" '
+                    'source="#{}-bitangents" offset="0"/>'.format(meshid))
 
             if (triangulate):
                 int_values = "<p>"
@@ -840,39 +934,55 @@ class DaeExporter:
 
             self.writel(S_SKIN, 1, '<controller id="{}">'.format(contid))
             if (skel_source is not None):
-                self.writel(S_SKIN, 2, '<skin source="#{}">'.format(skel_source))
+                self.writel(S_SKIN, 2, '<skin source="#{}">'.format(
+                    skel_source))
             else:
                 self.writel(S_SKIN, 2, '<skin source="#{}">'.format(meshid))
 
-            self.writel(S_SKIN, 3, '<bind_shape_matrix>{}</bind_shape_matrix>'.format(strmtx(node.matrix_world)))
+            self.writel(
+                S_SKIN, 3, '<bind_shape_matrix>{}</bind_shape_matrix>'.format(
+                    strmtx(node.matrix_world)))
             # Joint Names
             self.writel(S_SKIN, 3, '<source id="{}-joints">'.format(contid))
             name_values = ""
             for v in si["bone_names"]:
                 name_values += " {}".format(v)
 
-            self.writel(S_SKIN, 4, '<Name_array id="{}-joints-array" count="{}">{}</Name_array>'.format(contid, len(si["bone_names"]), name_values))
+            self.writel(
+                S_SKIN, 4, '<Name_array id="{}-joints-array" '
+                'count="{}">{}</Name_array>'.format(
+                    contid, len(si["bone_names"]), name_values))
             self.writel(S_SKIN, 4, '<technique_common>')
-            self.writel(S_SKIN, 4, '<accessor source="#{}-joints-array" count="{}" stride="1">'.format(contid, len(si["bone_names"])))
+            self.writel(
+                S_SKIN, 4, '<accessor source="#{}-joints-array" '
+                'count="{}" stride="1">'.format(contid, len(si["bone_names"])))
             self.writel(S_SKIN, 5, '<param name="JOINT" type="Name"/>')
             self.writel(S_SKIN, 4, '</accessor>')
             self.writel(S_SKIN, 4, '</technique_common>')
             self.writel(S_SKIN, 3, '</source>')
             # Pose Matrices!
-            self.writel(S_SKIN, 3, '<source id="{}-bind_poses">'.format(contid))
+            self.writel(S_SKIN, 3, '<source id="{}-bind_poses">'.format(
+                contid))
             pose_values = ""
             for v in si["bone_bind_poses"]:
                 pose_values += " {}".format(strmtx(v))
 
-            self.writel(S_SKIN, 4, '<float_array id="{}-bind_poses-array" count="{}">{}</float_array>'.format(contid, len(si["bone_bind_poses"]) * 16, pose_values))
+            self.writel(
+                S_SKIN, 4, '<float_array id="{}-bind_poses-array" '
+                'count="{}">{}</float_array>'.format(
+                    contid, len(si["bone_bind_poses"]) * 16, pose_values))
             self.writel(S_SKIN, 4, '<technique_common>')
-            self.writel(S_SKIN, 4, '<accessor source="#{}-bind_poses-array" count="{}" stride="16">'.format(contid, len(si["bone_bind_poses"])))
+            self.writel(
+                S_SKIN, 4, '<accessor source="#{}-bind_poses-array" '
+                'count="{}" stride="16">'.format(
+                    contid, len(si["bone_bind_poses"])))
             self.writel(S_SKIN, 5, '<param name="TRANSFORM" type="float4x4"/>')
             self.writel(S_SKIN, 4, '</accessor>')
             self.writel(S_SKIN, 4, '</technique_common>')
             self.writel(S_SKIN, 3, '</source>')
             # Skin Weights!
-            self.writel(S_SKIN, 3, '<source id="{}-skin_weights">'.format(contid))
+            self.writel(S_SKIN, 3, '<source id="{}-skin_weights">'.format(
+                contid))
             skin_weights = ""
             skin_weights_total = 0
             for v in vertices:
@@ -880,9 +990,14 @@ class DaeExporter:
                 for w in v.weights:
                     skin_weights += " {}".format(w)
 
-            self.writel(S_SKIN, 4, '<float_array id="{}-skin_weights-array" count="{}">{}</float_array>'.format(contid, skin_weights_total, skin_weights))
+            self.writel(
+                S_SKIN, 4, '<float_array id="{}-skin_weights-array" '
+                'count="{}">{}</float_array>'.format(
+                    contid, skin_weights_total, skin_weights))
             self.writel(S_SKIN, 4, '<technique_common>')
-            self.writel(S_SKIN, 4, '<accessor source="#{}-skin_weights-array" count="{}" stride="1">'.format(contid, skin_weights_total))
+            self.writel(
+                S_SKIN, 4, '<accessor source="#{}-skin_weights-array" '
+                'count="{}" stride="1">'.format(contid, skin_weights_total))
             self.writel(S_SKIN, 5, '<param name="WEIGHT" type="float"/>')
             self.writel(S_SKIN, 4, '</accessor>')
             self.writel(S_SKIN, 4, '</technique_common>')
@@ -890,13 +1005,20 @@ class DaeExporter:
 
             self.writel(S_SKIN, 3, '<joints>')
             self.writel(
-                S_SKIN, 4, '<input semantic="JOINT" source="#{}-joints"/>'.format(contid))
+                S_SKIN, 4,
+                '<input semantic="JOINT" source="#{}-joints"/>'.format(contid))
             self.writel(
-                S_SKIN, 4, '<input semantic="INV_BIND_MATRIX" source="#{}-bind_poses"/>'.format(contid))
+                S_SKIN, 4, '<input semantic="INV_BIND_MATRIX" '
+                'source="#{}-bind_poses"/>'.format(contid))
             self.writel(S_SKIN, 3, '</joints>')
-            self.writel(S_SKIN, 3, '<vertex_weights count="{}">'.format(len(vertices)))
-            self.writel(S_SKIN, 4, '<input semantic="JOINT" source="#{}-joints" offset="0"/>'.format(contid))
-            self.writel(S_SKIN, 4, '<input semantic="WEIGHT" source="#{}-skin_weights" offset="1"/>'.format(contid))
+            self.writel(
+                S_SKIN, 3, '<vertex_weights count="{}">'.format(len(vertices)))
+            self.writel(
+                S_SKIN, 4, '<input semantic="JOINT" '
+                'source="#{}-joints" offset="0"/>'.format(contid))
+            self.writel(
+                S_SKIN, 4, '<input semantic="WEIGHT" '
+                'source="#{}-skin_weights" offset="1"/>'.format(contid))
             vcounts = ""
             vs = ""
             vcount = 0
@@ -929,17 +1051,21 @@ class DaeExporter:
             if (node.parent.type == "ARMATURE"):
                 armature = node.parent
                 if (armcount > 1):
-                    self.operator.report({"WARNING"}, "Object \"{}\" refers "\
-                    "to more than one armature! "\
-                    "This is unsupported.".format(node.name))
+                    self.operator.report(
+                        {"WARNING"}, "Object \"{}\" refers "
+                        "to more than one armature! "
+                        "This is unsupported.".format(node.name))
                 if (armcount == 0):
-                    self.operator.report({"WARNING"}, "Object \"{}\" is child "\
-                    "of an armature, but has no armature modifier.".format(node.name))
+                    self.operator.report(
+                        {"WARNING"}, "Object \"{}\" is child "
+                        "of an armature, but has no armature modifier.".format(
+                            node.name))
 
         if (armcount > 0 and not armature):
-            self.operator.report({"WARNING"},
-            "Object \"{}\" has armature modifier, but is not a child of an "\
-            "armature. This is unsupported.".format(node.name))
+            self.operator.report(
+                {"WARNING"},
+                "Object \"{}\" has armature modifier, but is not a child of "
+                "an armature. This is unsupported.".format(node.name))
 
         if (node.data.shape_keys is not None):
             sk = node.data.shape_keys
@@ -962,21 +1088,28 @@ class DaeExporter:
 
         if ("skin_id" in meshdata):
             close_controller = True
-            self.writel(S_NODES, il, '<instance_controller url="#{}">'.format(meshdata["skin_id"]))
+            self.writel(S_NODES, il, '<instance_controller url="#{}">'.format(
+                meshdata["skin_id"]))
             for sn in self.skeleton_info[armature]["skeleton_nodes"]:
-                self.writel(S_NODES, il + 1, '<skeleton>#{}</skeleton>'.format(sn))
+                self.writel(S_NODES, il + 1, '<skeleton>#{}</skeleton>'.format(
+                    sn))
         elif ("morph_id" in meshdata):
-            self.writel(S_NODES, il, '<instance_controller url="#{}">'.format(meshdata["morph_id"]))
+            self.writel(S_NODES, il, '<instance_controller url="#{}">'.format(
+                meshdata["morph_id"]))
             close_controller = True
         elif (armature is None):
-            self.writel(S_NODES, il, '<instance_geometry url="#{}">'.format(meshdata["id"]))
+            self.writel(S_NODES, il, '<instance_geometry url="#{}">'.format(
+                meshdata["id"]))
 
         if (len(meshdata["material_assign"]) > 0):
 
             self.writel(S_NODES, il + 1, '<bind_material>')
             self.writel(S_NODES, il + 2, '<technique_common>')
             for m in meshdata["material_assign"]:
-                self.writel(S_NODES, il + 3, '<instance_material symbol="{}" target="#{}"/>'.format(m[1], m[0]))
+                self.writel(
+                    S_NODES, il + 3,
+                    '<instance_material symbol="{}" target="#{}"/>'.format(
+                        m[1], m[0]))
 
             self.writel(S_NODES, il + 2, '</technique_common>')
             self.writel(S_NODES, il + 1, '</bind_material>')
@@ -987,9 +1120,12 @@ class DaeExporter:
             self.writel(S_NODES, il, '</instance_geometry>')
 
     def export_armature_bone(self, bone, il, si):
-        is_ctrl_bone = (bone.name.startswith("ctrl") and self.config["use_exclude_ctrl_bones"])
+        is_ctrl_bone = (
+            bone.name.startswith("ctrl") and
+            self.config["use_exclude_ctrl_bones"])
         if (bone.parent is None and is_ctrl_bone is True):
-            self.operator.report({'WARNING'}, "Root bone cannot be a control bone.)
+            self.operator.report(
+                {'WARNING'}, "Root bone cannot be a control bone.")
             is_ctrl_bone = False
 
         if (is_ctrl_bone is False):
@@ -1018,7 +1154,8 @@ class DaeExporter:
 
         xform = bone.matrix_local
         if (is_ctrl_bone is False):
-            si["bone_bind_poses"].append((si["armature_xform"] * xform).inverted_safe())
+            si["bone_bind_poses"].append(
+                    (si["armature_xform"] * xform).inverted_safe())
 
         if (bone.parent is not None):
             xform = bone.parent.matrix_local.inverted_safe() * xform
@@ -1026,8 +1163,9 @@ class DaeExporter:
             si["skeleton_nodes"].append(boneid)
 
         if (is_ctrl_bone is False):
-            self.writel(S_NODES, il, '<matrix sid="transform">{}</matrix>'.format(strmtx(xform)))
-
+            self.writel(
+                S_NODES, il, "<matrix sid=\"transform\">{}</matrix>".format(
+                    strmtx(xform)))
 
         for c in bone.children:
             self.export_armature_bone(c, il, si)
@@ -1072,21 +1210,30 @@ class DaeExporter:
 
         camera = node.data
         camid = self.new_id("camera")
-        self.writel(S_CAMS, 1, '<camera id="{}" name="{}">'.format(camid, camera.name))
+        self.writel(S_CAMS, 1, '<camera id="{}" name="{}">'.format(
+            camid, camera.name))
         self.writel(S_CAMS, 2, '<optics>')
         self.writel(S_CAMS, 3, '<technique_common>')
         if (camera.type == "PERSP"):
             self.writel(S_CAMS, 4, '<perspective>')
-            self.writel(S_CAMS, 5, '<yfov> {} </yfov>'.format(math.degrees(camera.angle))) # I think?
-            self.writel(S_CAMS, 5, '<aspect_ratio> {} </aspect_ratio>'.format(self.scene.render.resolution_x / self.scene.render.resolution_y))
-            self.writel(S_CAMS, 5, '<znear> {} </znear>'.format(camera.clip_start))
+            self.writel(S_CAMS, 5, '<yfov> {} </yfov>'.format(
+                    math.degrees(camera.angle)))  # I think?
+            self.writel(S_CAMS, 5, '<aspect_ratio> {} </aspect_ratio>'.format(
+                self.scene.render.resolution_x /
+                self.scene.render.resolution_y))
+            self.writel(S_CAMS, 5, '<znear> {} </znear>'.format(
+                camera.clip_start))
             self.writel(S_CAMS, 5, '<zfar> {} </zfar>'.format(camera.clip_end))
             self.writel(S_CAMS, 4, '</perspective>')
         else:
             self.writel(S_CAMS, 4, '<orthographic>')
-            self.writel(S_CAMS, 5, '<xmag> {} </xmag>'.format(camera.ortho_scale * 0.5))  # I think?
-            self.writel(S_CAMS, 5, '<aspect_ratio> {} </aspect_ratio>'.format(self.scene.render.resolution_x / self.scene.render.resolution_y))
-            self.writel(S_CAMS, 5, '<znear> {} </znear>'.format(camera.clip_start))
+            self.writel(S_CAMS, 5, '<xmag> {} </xmag>'.format(
+                camera.ortho_scale * 0.5))  # I think?
+            self.writel(S_CAMS, 5, '<aspect_ratio> {} </aspect_ratio>'.format(
+                self.scene.render.resolution_x /
+                self.scene.render.resolution_y))
+            self.writel(S_CAMS, 5, '<znear> {} </znear>'.format(
+                camera.clip_start))
             self.writel(S_CAMS, 5, '<zfar> {} </zfar>'.format(camera.clip_end))
             self.writel(S_CAMS, 4, '</orthographic>')
 
@@ -1102,32 +1249,45 @@ class DaeExporter:
 
         light = node.data
         lightid = self.new_id("light")
-        self.writel(S_LAMPS, 1, '<light id="{}" name="{}">'.format(lightid, light.name))
+        self.writel(S_LAMPS, 1, '<light id="{}" name="{}">'.format(
+                lightid, light.name))
         # self.writel(S_LAMPS, 2, '<optics>')
         self.writel(S_LAMPS, 3, '<technique_common>')
 
         if (light.type == "POINT"):
             self.writel(S_LAMPS, 4, '<point>')
-            self.writel(S_LAMPS, 5, '<color>{}</color>'.format(strarr(light.color)))
+            self.writel(S_LAMPS, 5, '<color>{}</color>'.format(
+                strarr(light.color)))
             # convert to linear attenuation
             att_by_distance = 2.0 / light.distance
-            self.writel(S_LAMPS, 5, '<linear_attenuation>{}</linear_attenuation>'.format(att_by_distance))
+            self.writel(
+                S_LAMPS, 5,
+                '<linear_attenuation>{}</linear_attenuation>'.format(
+                    att_by_distance))
             if (light.use_sphere):
-                self.writel(S_LAMPS, 5, '<zfar>{}</zfar>'.format(light.distance))
+                self.writel(S_LAMPS, 5, '<zfar>{}</zfar>'.format(
+                    light.distance))
 
             self.writel(S_LAMPS, 4, '</point>')
         elif (light.type == "SPOT"):
             self.writel(S_LAMPS, 4, '<spot>')
-            self.writel(S_LAMPS, 5, '<color>{}</color>'.format(strarr(light.color)))
+            self.writel(S_LAMPS, 5, '<color>{}</color>'.format(
+                strarr(light.color)))
             # convert to linear attenuation
             att_by_distance = 2.0 / light.distance
-            self.writel(S_LAMPS, 5, '<linear_attenuation>{}</linear_attenuation>'.format(att_by_distance))
-            self.writel(S_LAMPS, 5, '<falloff_angle>{}</falloff_angle>'.format(math.degrees(light.spot_size / 2)))
+            self.writel(
+                S_LAMPS, 5,
+                '<linear_attenuation>{}</linear_attenuation>'.format(
+                    att_by_distance))
+            self.writel(
+                S_LAMPS, 5, '<falloff_angle>{}</falloff_angle>'.format(
+                    math.degrees(light.spot_size / 2)))
             self.writel(S_LAMPS, 4, '</spot>')
 
         else:  # write a sun lamp for everything else (not supported)
             self.writel(S_LAMPS, 4, '<directional>')
-            self.writel(S_LAMPS, 5, '<color>{}</color>'.format(strarr(light.color)))
+            self.writel(S_LAMPS, 5, '<color>{}</color>'.format(
+                strarr(light.color)))
             self.writel(S_LAMPS, 4, '</directional>')
 
         self.writel(S_LAMPS, 3, '</technique_common>')
@@ -1139,14 +1299,19 @@ class DaeExporter:
     def export_empty_node(self, node, il):
         self.writel(S_NODES, 4, '<extra>')
         self.writel(S_NODES, 5, '<technique profile="GODOT">')
-        self.writel(S_NODES, 6, '<empty_draw_type>{}</empty_draw_type>'.format(node.empty_draw_type))
+        self.writel(
+            S_NODES, 6,
+            '<empty_draw_type>{}</empty_draw_type>'.format(
+                node.empty_draw_type))
         self.writel(S_NODES, 5, '</technique>')
         self.writel(S_NODES, 4, '</extra>')
 
     def export_curve(self, curve):
         splineid = self.new_id("spline")
 
-        self.writel(S_GEOM, 1, '<geometry id="{}" name="{}">'.format(splineid, curve.name))
+        self.writel(
+            S_GEOM, 1, '<geometry id="{}" name="{}">'.format(
+                splineid, curve.name))
         self.writel(S_GEOM, 2, '<spline closed="0">')
 
         points = []
@@ -1192,9 +1357,14 @@ class DaeExporter:
         position_values = ""
         for x in points:
             position_values += " {}".format(x)
-        self.writel(S_GEOM, 4, '<float_array id="{}-positions-array" count="{}">{}</float_array>'.format(splineid, len(points), position_values))
+        self.writel(
+            S_GEOM, 4, '<float_array id="{}-positions-array" '
+            'count="{}">{}</float_array>'.format(
+                splineid, len(points), position_values))
         self.writel(S_GEOM, 4, '<technique_common>')
-        self.writel(S_GEOM, 4, '<accessor source="#{}-positions-array" count="{}" stride="3">'.format(splineid, len(points) / 3))
+        self.writel(
+            S_GEOM, 4, '<accessor source="#{}-positions-array" '
+            'count="{}" stride="3">'.format(splineid, len(points) / 3))
         self.writel(S_GEOM, 5, '<param name="X" type="float"/>')
         self.writel(S_GEOM, 5, '<param name="Y" type="float"/>')
         self.writel(S_GEOM, 5, '<param name="Z" type="float"/>')
@@ -1205,9 +1375,14 @@ class DaeExporter:
         intangent_values = ""
         for x in handles_in:
             intangent_values += " {}".format(x)
-        self.writel(S_GEOM, 4, '<float_array id="{}-intangents-array" count="{}">{}</float_array>'.format(splineid, len(points), intangent_values))
+        self.writel(
+            S_GEOM, 4, '<float_array id="{}-intangents-array" '
+            'count="{}">{}</float_array>'.format(
+                splineid, len(points), intangent_values))
         self.writel(S_GEOM, 4, '<technique_common>')
-        self.writel(S_GEOM, 4, '<accessor source="#{}-intangents-array" count="{}" stride="3">'.format(splineid, len(points) / 3))
+        self.writel(
+            S_GEOM, 4, '<accessor source="#{}-intangents-array" '
+            'count="{}" stride="3">'.format(splineid, len(points) / 3))
         self.writel(S_GEOM, 5, '<param name="X" type="float"/>')
         self.writel(S_GEOM, 5, '<param name="Y" type="float"/>')
         self.writel(S_GEOM, 5, '<param name="Z" type="float"/>')
@@ -1218,22 +1393,33 @@ class DaeExporter:
         outtangent_values = ""
         for x in handles_out:
             outtangent_values += " {}".format(x)
-        self.writel(S_GEOM, 4, '<float_array id="{}-outtangents-array" count="{}">{}</float_array>'.format(splineid, len(points), outtangent_values))
+        self.writel(
+            S_GEOM, 4, '<float_array id="{}-outtangents-array" '
+            'count="{}">{}</float_array>'.format(
+                splineid, len(points), outtangent_values))
         self.writel(S_GEOM, 4, '<technique_common>')
-        self.writel(S_GEOM, 4, '<accessor source="#{}-outtangents-array" count="{}" stride="3">'.format(splineid, len(points) / 3))
+        self.writel(
+            S_GEOM, 4, '<accessor source="#{}-outtangents-array" '
+            'count="{}" stride="3">'.format(splineid, len(points) / 3))
         self.writel(S_GEOM, 5, '<param name="X" type="float"/>')
         self.writel(S_GEOM, 5, '<param name="Y" type="float"/>')
         self.writel(S_GEOM, 5, '<param name="Z" type="float"/>')
         self.writel(S_GEOM, 4, '</accessor>')
         self.writel(S_GEOM, 3, '</source>')
 
-        self.writel(S_GEOM, 3, '<source id="{}-interpolations">'.format(splineid))
+        self.writel(
+            S_GEOM, 3, '<source id="{}-interpolations">'.format(splineid))
         interpolation_values = ""
         for x in interps:
             interpolation_values += " {}".format(x)
-        self.writel(S_GEOM, 4, '<Name_array id="{}-interpolations-array" count="{}">{}</Name_array>'.format(splineid, len(interps), interpolation_values))
+        self.writel(
+            S_GEOM, 4, '<Name_array id="{}-interpolations-array" '
+            'count="{}">{}</Name_array>'
+            .format(splineid, len(interps), interpolation_values))
         self.writel(S_GEOM, 4, '<technique_common>')
-        self.writel(S_GEOM, 4, '<accessor source="#{}-interpolations-array" count="{}" stride="1">'.format(splineid, len(interps)))
+        self.writel(
+            S_GEOM, 4, '<accessor source="#{}-interpolations-array" '
+            'count="{}" stride="1">'.format(splineid, len(interps)))
         self.writel(S_GEOM, 5, '<param name="INTERPOLATION" type="name"/>')
         self.writel(S_GEOM, 4, '</accessor>')
         self.writel(S_GEOM, 3, '</source>')
@@ -1242,20 +1428,36 @@ class DaeExporter:
         tilt_values = ""
         for x in tilts:
             tilt_values += " {}".format(x)
-        self.writel(S_GEOM, 4, '<float_array id="{}-tilts-array" count="{}">{}</float_array>'.format(splineid, len(tilts), tilt_values))
+        self.writel(
+            S_GEOM, 4,
+            '<float_array id="{}-tilts-array" count="{}">{}</float_array>'
+            .format(splineid, len(tilts), tilt_values))
         self.writel(S_GEOM, 4, '<technique_common>')
-        self.writel(S_GEOM, 4, '<accessor source="#{}-tilts-array" count="{}" stride="1">'.format(splineid, len(tilts)))
+        self.writel(
+            S_GEOM, 4, '<accessor source="#{}-tilts-array" '
+            'count="{}" stride="1">'.format(splineid, len(tilts)))
         self.writel(S_GEOM, 5, '<param name="TILT" type="float"/>')
         self.writel(S_GEOM, 4, '</accessor>')
         self.writel(S_GEOM, 3, '</source>')
 
         self.writel(S_GEOM, 3, '<control_vertices>')
         self.writel(
-            S_GEOM, 4, '<input semantic="POSITION" source="#{}-positions"/>'.format(splineid))
-        self.writel(S_GEOM, 4, '<input semantic="IN_TANGENT" source="#{}-intangents"/>'.format(splineid))
-        self.writel(S_GEOM, 4, '<input semantic="OUT_TANGENT" source="#{}-outtangents"/>'.format(splineid))
-        self.writel(S_GEOM, 4, '<input semantic="INTERPOLATION" source="#{}-interpolations"/>'.format(splineid))
-        self.writel(S_GEOM, 4, '<input semantic="TILT" source="#{}-tilts"/>'.format(splineid))
+            S_GEOM, 4,
+            '<input semantic="POSITION" source="#{}-positions"/>'
+            .format(splineid))
+        self.writel(
+            S_GEOM, 4,
+            '<input semantic="IN_TANGENT" source="#{}-intangents"/>'
+            .format(splineid))
+        self.writel(
+            S_GEOM, 4, '<input semantic="OUT_TANGENT" '
+            'source="#{}-outtangents"/>'.format(splineid))
+        self.writel(
+            S_GEOM, 4, '<input semantic="INTERPOLATION" '
+            'source="#{}-interpolations"/>'.format(splineid))
+        self.writel(
+            S_GEOM, 4, '<input semantic="TILT" source="#{}-tilts"/>'
+            .format(splineid))
         self.writel(S_GEOM, 3, '</control_vertices>')
 
         self.writel(S_GEOM, 2, '</spline>')
@@ -1269,7 +1471,8 @@ class DaeExporter:
 
         curveid = self.export_curve(node.data)
 
-        self.writel(S_NODES, il, '<instance_geometry url="#{}">'.format(curveid))
+        self.writel(S_NODES, il, '<instance_geometry url="#{}">'.format(
+            curveid))
         self.writel(S_NODES, il, '</instance_geometry>')
 
     def export_node(self, node, il):
@@ -1279,10 +1482,12 @@ class DaeExporter:
         prev_node = bpy.context.scene.objects.active
         bpy.context.scene.objects.active = node
 
-        self.writel(S_NODES, il, '<node id="{}" name="{}" type="NODE">'.format(self.validate_id(node.name), node.name))
+        self.writel(S_NODES, il, '<node id="{}" name="{}" type="NODE">'.format(
+            self.validate_id(node.name), node.name))
         il += 1
 
-        self.writel(S_NODES, il, '<matrix sid="transform">{}</matrix>'.format(strmtx(node.matrix_local)))
+        self.writel(S_NODES, il, '<matrix sid="transform">{}</matrix>'.format(
+            strmtx(node.matrix_local)))
         # print("NODE TYPE: "+node.type+" NAME: "+node.name)
         if (node.type == "MESH"):
             self.export_mesh_node(node, il)
@@ -1326,7 +1531,8 @@ class DaeExporter:
 
     def export_scene(self):
         self.writel(S_NODES, 0, '<library_visual_scenes>')
-        self.writel(S_NODES, 1, '<visual_scene id="{}" name="scene">'.format(self.scene_name ))
+        self.writel(S_NODES, 1, '<visual_scene id="{}" name="scene">'.format(
+            self.scene_name))
 
         # validate nodes
         for obj in self.scene.objects:
@@ -1357,8 +1563,10 @@ class DaeExporter:
             S_ASSET, 2, '<authoring_tool> Collada Exporter for Blender 2.6+, '
             'by Juan Linietsky (juan@codenix.com) </authoring_tool>')
         self.writel(S_ASSET, 1, '</contributor>')
-        self.writel(S_ASSET, 1, '<created>{}</created>'.format(time.strftime("%Y-%m-%dT%H:%M:%SZ     ")))
-        self.writel(S_ASSET, 1, '<modified>{}</modified>'.format(time.strftime("%Y-%m-%dT%H:%M:%SZ")))
+        self.writel(S_ASSET, 1, '<created>{}</created>'.format(
+            time.strftime("%Y-%m-%dT%H:%M:%SZ     ")))
+        self.writel(S_ASSET, 1, '<modified>{}</modified>'.format(
+            time.strftime("%Y-%m-%dT%H:%M:%SZ")))
         self.writel(S_ASSET, 1, '<unit meter="1.0" name="meter"/>')
         self.writel(S_ASSET, 1, '<up_axis>Z_UP</up_axis>')
         self.writel(S_ASSET, 0, '</asset>')
@@ -1382,9 +1590,14 @@ class DaeExporter:
 
         # Time Source
         self.writel(S_ANIM, 2, '<source id="{}-input">'.format(anim_id))
-        self.writel(S_ANIM, 3, '<float_array id="{}-input-array" count="{}">{}</float_array>'.format(anim_id, frame_total, source_frames))
+        self.writel(
+            S_ANIM, 3, '<float_array id="{}-input-array" '
+            'count="{}">{}</float_array>'.format(
+                anim_id, frame_total, source_frames))
         self.writel(S_ANIM, 3, '<technique_common>')
-        self.writel(S_ANIM, 4, '<accessor source="#{}-input-array" count="{}" stride="1">'.format(anim_id, frame_total))
+        self.writel(
+            S_ANIM, 4, '<accessor source="#{}-input-array" '
+            'count="{}" stride="1">'.format(anim_id, frame_total))
         self.writel(S_ANIM, 5, '<param name="TIME" type="float"/>')
         self.writel(S_ANIM, 4, '</accessor>')
         self.writel(S_ANIM, 3, '</technique_common>')
@@ -1392,44 +1605,74 @@ class DaeExporter:
 
         if (matrices):
             # Transform Source
-            self.writel(S_ANIM, 2, '<source id="{}-transform-output">'.format(anim_id))
-            self.writel(S_ANIM, 3, '<float_array id="{}-transform-output-array" count="{}">{}</float_array>'.format(anim_id, frame_total * 16, source_transforms))
+            self.writel(
+                S_ANIM, 2, '<source id="{}-transform-output">'.format(anim_id))
+            self.writel(
+                S_ANIM, 3, '<float_array id="{}-transform-output-array" '
+                'count="{}">{}</float_array>'.format(
+                    anim_id, frame_total * 16, source_transforms))
             self.writel(S_ANIM, 3, '<technique_common>')
-            self.writel(S_ANIM, 4, '<accessor source="#{}-transform-output-array" count="{}" stride="16">'.format(anim_id, frame_total))
+            self.writel(
+                S_ANIM, 4,
+                '<accessor source="#{}-transform-output-array" count="{}" '
+                'stride="16">'.format(anim_id, frame_total))
             self.writel(S_ANIM, 5, '<param name="TRANSFORM" type="float4x4"/>')
             self.writel(S_ANIM, 4, '</accessor>')
             self.writel(S_ANIM, 3, '</technique_common>')
             self.writel(S_ANIM, 2, '</source>')
         else:
             # Value Source
-            self.writel(S_ANIM, 2, '<source id="{}-transform-output">'.format(anim_id))
-            self.writel(S_ANIM, 3, '<float_array id="{}-transform-output-array" count="{}">{}</float_array>'.format(anim_id, frame_total, source_transforms))
+            self.writel(
+                S_ANIM, 2,
+                '<source id="{}-transform-output">'.format(anim_id))
+            self.writel(
+                S_ANIM, 3, '<float_array id="{}-transform-output-array" '
+                'count="{}">{}</float_array>'.format(
+                    anim_id, frame_total, source_transforms))
             self.writel(S_ANIM, 3, '<technique_common>')
-            self.writel(S_ANIM, 4, '<accessor source="#{}-transform-output-array" count="{}" stride="1">'.format(anim_id, frame_total))
+            self.writel(
+                S_ANIM, 4, '<accessor source="#{}-transform-output-array" '
+                'count="{}" stride="1">'.format(anim_id, frame_total))
             self.writel(S_ANIM, 5, '<param name="X" type="float"/>')
             self.writel(S_ANIM, 4, '</accessor>')
             self.writel(S_ANIM, 3, '</technique_common>')
             self.writel(S_ANIM, 2, '</source>')
 
         # Interpolation Source
-        self.writel(S_ANIM, 2, '<source id="{}-interpolation-output">'.format(anim_id))
-        self.writel(S_ANIM, 3, '<Name_array id="{}-interpolation-output-array" count="{}">{}</Name_array>'.format(anim_id, frame_total, source_interps))
+        self.writel(
+            S_ANIM, 2, '<source id="{}-interpolation-output">'.format(anim_id))
+        self.writel(
+            S_ANIM, 3, '<Name_array id="{}-interpolation-output-array" '
+            'count="{}">{}</Name_array>'.format(
+                anim_id, frame_total, source_interps))
         self.writel(S_ANIM, 3, '<technique_common>')
-        self.writel(S_ANIM, 4, '<accessor source="#{}-interpolation-output-array" count="{}" stride="1">'.format(anim_id, frame_total))
+        self.writel(
+            S_ANIM, 4, '<accessor source="#{}-interpolation-output-array" '
+            'count="{}" stride="1">'.format(anim_id, frame_total))
         self.writel(S_ANIM, 5, '<param name="INTERPOLATION" type="Name"/>')
         self.writel(S_ANIM, 4, '</accessor>')
         self.writel(S_ANIM, 3, '</technique_common>')
         self.writel(S_ANIM, 2, '</source>')
 
         self.writel(S_ANIM, 2, '<sampler id="{}-sampler">'.format(anim_id))
-        self.writel(S_ANIM, 3, '<input semantic="INPUT" source="#{}-input"/>'.format(anim_id))
-        self.writel(S_ANIM, 3, '<input semantic="OUTPUT" source="#{}-transform-output"/>'.format(anim_id))
-        self.writel(S_ANIM, 3, '<input semantic="INTERPOLATION" source="#{}-interpolation-output"/>'.format(anim_id))
+        self.writel(
+            S_ANIM, 3,
+            '<input semantic="INPUT" source="#{}-input"/>'.format(anim_id))
+        self.writel(
+            S_ANIM, 3, '<input semantic="OUTPUT" '
+            'source="#{}-transform-output"/>'.format(anim_id))
+        self.writel(
+            S_ANIM, 3, '<input semantic="INTERPOLATION" '
+            'source="#{}-interpolation-output"/>'.format(anim_id))
         self.writel(S_ANIM, 2, '</sampler>')
         if (matrices):
-            self.writel(S_ANIM, 2, '<channel source="#{}-sampler" target="{}/transform"/>'.format(anim_id, target))
+            self.writel(
+                S_ANIM, 2, '<channel source="#{}-sampler" '
+                'target="{}/transform"/>'.format(anim_id, target))
         else:
-            self.writel(S_ANIM, 2, '<channel source="#{}-sampler" target="{}"/>'.format(anim_id, target))
+            self.writel(
+                S_ANIM, 2, '<channel source="#{}-sampler" '
+                'target="{}"/>'.format(anim_id, target))
         self.writel(S_ANIM, 1, '</animation>')
 
         return [anim_id]
@@ -1624,14 +1867,15 @@ class DaeExporter:
                 end = x.frame_range[1] * framelen
                 # print("Export anim: "+x.name)
                 self.writel(
-                    S_ANIM_CLIPS, 1, '<animation_clip name="{}" start="{}" end="{}">'.format(x.name, start, end))
+                    S_ANIM_CLIPS, 1, '<animation_clip name="{}" '
+                    'start="{}" end="{}">'.format(x.name, start, end))
                 for z in tcn:
                     self.writel(S_ANIM_CLIPS, 2,
                                 '<instance_animation url="#{}"/>'.format(z))
                 self.writel(S_ANIM_CLIPS, 1, '</animation_clip>')
                 if (len(tcn) == 0):
                     self.operator.report(
-                        {"WARNING"}, "Animation clip \"{}\" contains no "\
+                        {"WARNING"}, "Animation clip \"{}\" contains no "
                         "tracks.".format(x.name))
 
             self.writel(S_ANIM_CLIPS, 0, '</library_animation_clips>')
@@ -1707,7 +1951,9 @@ class DaeExporter:
                 f.write(bytes(l + "\n", "UTF-8"))
 
         f.write(bytes('<scene>\n', "UTF-8"))
-        f.write(bytes('\t<instance_visual_scene url="#{}" />\n'.format(self.scene_name), "UTF-8"))
+        f.write(bytes(
+            '\t<instance_visual_scene url="#{}" />\n'.format(
+                self.scene_name), "UTF-8"))
         f.write(bytes('</scene>\n', "UTF-8"))
         f.write(bytes('</COLLADA>\n', "UTF-8"))
         return True
