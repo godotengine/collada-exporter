@@ -41,8 +41,8 @@ bl_info = {
 
 class godot_export_manager(bpy.types.Panel):
     bl_label = "Godot Export Manager"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
     bl_context = "scene"
 
     bpy.types.Scene.godot_export_on_save = BoolProperty(default=False)
@@ -79,7 +79,7 @@ class godot_export_manager(bpy.types.Panel):
         col.template_list("UI_List_Godot", "dummy", scene,
                           "godot_export_groups", scene,
                           "godot_export_groups_index", rows=1, maxrows=10,
-                          type='DEFAULT')
+                          type="DEFAULT")
 
         col = row.column(align=True)
         col.operator("scene.godot_add_export_group", text="", icon="ZOOMIN")
@@ -165,13 +165,13 @@ class add_objects_to_group(bpy.types.Operator):
                     else:
                         objects_str += ", "+object.name
 
-            self.report({'INFO'}, "{} added to group.".format(objects_str))
+            self.report({"INFO"}, "{} added to group.".format(objects_str))
             if self.undo:
                 bpy.ops.ed.undo_push(message="Objects added to group")
         else:
-            self.report({'WARNING'}, "Create a group first.")
+            self.report({"WARNING"}, "Create a group first.")
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
 class del_objects_from_group(bpy.types.Operator):
@@ -202,12 +202,12 @@ class del_objects_from_group(bpy.types.Operator):
                         objects_str += ", "+object.name
                     j += 1
 
-            self.report({'INFO'}, "{} deleted from group.".format(objects_str))
+            self.report({"INFO"}, "{} deleted from group.".format(objects_str))
             bpy.ops.ed.undo_push(message="Objects deleted from group")
         else:
-            self.report({'WARNING'}, "There is no group to delete from.")
+            self.report({"WARNING"}, "There is no group to delete from.")
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
 class select_group_objects(bpy.types.Operator):
@@ -226,7 +226,7 @@ class select_group_objects(bpy.types.Operator):
                 bpy.data.objects[node.name].select = True
                 context.scene.objects.active = bpy.data.objects[node.name]
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
 class export_groups_autosave(bpy.types.Operator):
@@ -240,10 +240,10 @@ class export_groups_autosave(bpy.types.Operator):
             for i in range(len(scene.godot_export_groups)):
                 if scene.godot_export_groups[i].active:
                     bpy.ops.scene.godot_export_group(idx=i)
-        self.report({'INFO'}, "All Groups exported.")
+        self.report({"INFO"}, "All Groups exported.")
         bpy.ops.ed.undo_push(message="Export all Groups")
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
 class export_all_groups(bpy.types.Operator):
@@ -257,9 +257,9 @@ class export_all_groups(bpy.types.Operator):
         for i in range(0, len(scene.godot_export_groups)):
             bpy.ops.scene.godot_export_group(idx=i, export_all=True)
 
-        self.report({'INFO'}, "All Groups exported.")
+        self.report({"INFO"}, "All Groups exported.")
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
 class export_group(bpy.types.Operator):
@@ -314,7 +314,7 @@ class export_group(bpy.types.Operator):
         group = context.scene.godot_export_groups
 
         if not group[self.idx].active and self.export_all:
-            return{'FINISHED'}
+            return{"FINISHED"}
 
         for i, object in enumerate(group[self.idx].nodes):
             if object.name in bpy.data.objects:
@@ -338,7 +338,8 @@ class export_group(bpy.types.Operator):
             if group[self.idx].export_name.endswith(".dae"):
                 path = os.path.join(path, group[self.idx].export_name)
             else:
-                path = os.path.join(path, "{}.dae".format(group[self.idx].export_name))
+                path = os.path.join(
+                    path, "{}.dae".format(group[self.idx].export_name))
 
             hide_select = []
             for object in context.scene.objects:
@@ -395,8 +396,8 @@ class export_group(bpy.types.Operator):
                     self.idx].anim_optimize_precision,
                 use_metadata=group[self.idx].use_metadata)
 
-            self.report({'INFO'},
-                        '"{}" Group exported.'.format(group[self.idx].name))
+            self.report({"INFO"},
+                        "\"{}\" Group exported.".format(group[self.idx].name))
             msg = "Export Group {}".format(group[self.idx].name)
 
             bpy.ops.ed.undo_push(message="")
@@ -404,9 +405,9 @@ class export_group(bpy.types.Operator):
             bpy.ops.ed.undo_push(message=msg)
 
         else:
-            self.report({'INFO'}, "Define Export Name and Export Path.")
+            self.report({"INFO"}, "Define Export Name and Export Path.")
 
-        return{'FINISHED'}
+        return{"FINISHED"}
 
 
 class add_export_group(bpy.types.Operator):
@@ -426,7 +427,7 @@ class add_export_group(bpy.types.Operator):
         scene.godot_export_groups_index = len(scene.godot_export_groups)-1
         bpy.ops.ed.undo_push(message="Create New Export Group")
 
-        return{'FINISHED'}
+        return{"FINISHED"}
 
 
 class del_export_group(bpy.types.Operator):
@@ -447,7 +448,7 @@ class del_export_group(bpy.types.Operator):
             scene.godot_export_groups_index -= 1
         bpy.ops.ed.undo_push(message="Delete Export Group")
 
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
 class godot_node_list(bpy.types.PropertyGroup):
@@ -461,15 +462,15 @@ class godot_export_groups(bpy.types.PropertyGroup):
     export_path = StringProperty(subtype="DIR_PATH")
     active = BoolProperty(default=True, description="Export Group")
 
-    object_types = EnumProperty(name="Object Types", options={'ENUM_FLAG'},
-                                items=(('EMPTY', "Empty", ""),
-                                       ('CAMERA', "Camera", ""),
-                                       ('LAMP', "Lamp", ""),
-                                       ('ARMATURE', "Armature", ""),
-                                       ('MESH', "Mesh", ""),
-                                       ('CURVE', "Curve", ""), ),
-                                default={'EMPTY', 'CAMERA', 'LAMP',
-                                         'ARMATURE', 'MESH', 'CURVE'})
+    object_types = EnumProperty(name="Object Types", options={"ENUM_FLAG"},
+                                items=(("EMPTY", "Empty", ""),
+                                       ("CAMERA", "Camera", ""),
+                                       ("LAMP", "Lamp", ""),
+                                       ("ARMATURE", "Armature", ""),
+                                       ("MESH", "Mesh", ""),
+                                       ("CURVE", "Curve", ""), ),
+                                default={"EMPTY", "CAMERA", "LAMP",
+                                         "ARMATURE", "MESH", "CURVE"})
 
     apply_scale = BoolProperty(name="Apply Scale",
                                description="Apply Scale before export.",
@@ -526,7 +527,7 @@ class godot_export_groups(bpy.types.PropertyGroup):
         soft_min=1, soft_max=16, default=6.0)
 
     use_metadata = BoolProperty(name="Use Metadata", default=True,
-                                options={'HIDDEN'})
+                                options={"HIDDEN"})
     use_include_particle_duplicates = BoolProperty(
         name="Include Particle Duplicates", default=True)
 
