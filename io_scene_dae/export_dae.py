@@ -159,6 +159,13 @@ class DaeExporter:
         line = "{}{}".format(indent * "\t", text)
         self.sections[section].append(line)
 
+    def purge_empty_nodes(self):
+        sections = {}
+        for k, v in self.sections.items():
+            if not (len(v) == 2 and v[0][1:] == v[1][2:]):
+                sections[k] = v
+        self.sections = sections
+
     def export_image(self, image):
         img_id = self.image_cache.get(image)
         if img_id:
@@ -1706,7 +1713,7 @@ class DaeExporter:
                     for bone in node.data.bones:
                         if((bone.name.startswith("ctrl") and self.config["use_exclude_ctrl_bones"])):
                             continue
-                            
+
                         bone_name = self.skeleton_info[node]["bone_ids"][bone]
 
                         if (not (bone_name in xform_cache)):
@@ -1875,6 +1882,8 @@ class DaeExporter:
         self.writel(S_IMGS, 0, '</library_images>')
         self.writel(S_MATS, 0, '</library_materials>')
         self.writel(S_FX, 0, '</library_effects>')
+
+        self.purge_empty_nodes()
 
         if (self.config["use_anim"]):
             self.export_animations()
