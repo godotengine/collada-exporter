@@ -1508,11 +1508,9 @@ class DaeExporter:
 
     def export_asset(self):
         self.writel(S_ASSET, 0, '<asset>')
-        # Why is this time stuff mandatory?, no one could care less...
         self.writel(S_ASSET, 1, '<contributor>')
-        # Who made Collada, the FBI ?
-        self.writel(S_ASSET, 2, '<author> Anonymous </author>')
-        # Who made Collada, the FBI ?
+        author = bpy.context.user_preferences.system.author or "Anonymous"
+        self.writel(S_ASSET, 2, "<author>{}</author>".format(author))
         self.writel(
             S_ASSET, 2, '<authoring_tool> Collada Exporter for Blender 2.6+, '
             'by Juan Linietsky (juan@codenix.com) </authoring_tool>')
@@ -1706,7 +1704,7 @@ class DaeExporter:
                     for bone in node.data.bones:
                         if((bone.name.startswith("ctrl") and self.config["use_exclude_ctrl_bones"])):
                             continue
-                            
+
                         bone_name = self.skeleton_info[node]["bone_ids"][bone]
 
                         if (not (bone_name in xform_cache)):
