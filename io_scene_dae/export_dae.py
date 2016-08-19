@@ -1148,7 +1148,7 @@ class DaeExporter:
             boneid = self.new_id("bone")
             boneidx = si["bone_count"]
             si["bone_count"] += 1
-            bonesid = + "{}-{}".format(si["id"], boneidx)
+            bonesid = "{}-{}".format(si["id"], boneidx)
             if (bone.name in self.used_bones):
                 if (self.config["use_anim_action_all"]):
                     self.operator.report(
@@ -1232,25 +1232,25 @@ class DaeExporter:
         self.writel(S_CAMS, 3, "<technique_common>")
         if (camera.type == "PERSP"):
             self.writel(S_CAMS, 4, "<perspective>")
-            self.writel(S_CAMS, 5, "<yfov> {} </yfov>".format(
+            self.writel(S_CAMS, 5, "<yfov>{}</yfov>".format(
                     math.degrees(camera.angle)))  # I think?
-            self.writel(S_CAMS, 5, "<aspect_ratio> {} </aspect_ratio>".format(
+            self.writel(S_CAMS, 5, "<aspect_ratio>{}</aspect_ratio>".format(
                 self.scene.render.resolution_x /
                 self.scene.render.resolution_y))
-            self.writel(S_CAMS, 5, "<znear> {} </znear>".format(
+            self.writel(S_CAMS, 5, "<znear>{}</znear>".format(
                 camera.clip_start))
-            self.writel(S_CAMS, 5, "<zfar> {} </zfar>".format(camera.clip_end))
+            self.writel(S_CAMS, 5, "<zfar>{}</zfar>".format(camera.clip_end))
             self.writel(S_CAMS, 4, "</perspective>")
         else:
             self.writel(S_CAMS, 4, "<orthographic>")
-            self.writel(S_CAMS, 5, "<xmag> {} </xmag>".format(
+            self.writel(S_CAMS, 5, "<xmag>{}</xmag>".format(
                 camera.ortho_scale * 0.5))  # I think?
-            self.writel(S_CAMS, 5, "<aspect_ratio> {} </aspect_ratio>".format(
+            self.writel(S_CAMS, 5, "<aspect_ratio>{}</aspect_ratio>".format(
                 self.scene.render.resolution_x /
                 self.scene.render.resolution_y))
-            self.writel(S_CAMS, 5, "<znear> {} </znear>".format(
+            self.writel(S_CAMS, 5, "<znear>{}</znear>".format(
                 camera.clip_start))
-            self.writel(S_CAMS, 5, "<zfar> {} </zfar>".format(camera.clip_end))
+            self.writel(S_CAMS, 5, "<zfar>{}</zfar>".format(camera.clip_end))
             self.writel(S_CAMS, 4, "</orthographic>")
 
         self.writel(S_CAMS, 3, "</technique_common>")
@@ -1583,11 +1583,11 @@ class DaeExporter:
         self.writel(S_ASSET, 2, "<author> Anonymous </author>")
         # Who made Collada, the FBI ?
         self.writel(
-            S_ASSET, 2, "<authoring_tool> Collada Exporter for Blender 2.6+, "
-            "by Juan Linietsky (juan@codenix.com) </authoring_tool>")
+            S_ASSET, 2, "<authoring_tool>Collada Exporter for Blender 2.6+, "
+            "by Juan Linietsky (juan@codenix.com)</authoring_tool>")
         self.writel(S_ASSET, 1, "</contributor>")
         self.writel(S_ASSET, 1, "<created>{}</created>".format(
-            time.strftime("%Y-%m-%dT%H:%M:%SZ     ")))
+            time.strftime("%Y-%m-%dT%H:%M:%SZ")))
         self.writel(S_ASSET, 1, "<modified>{}</modified>".format(
             time.strftime("%Y-%m-%dT%H:%M:%SZ")))
         self.writel(S_ASSET, 1, "<unit meter=\"1.0\" name=\"meter\"/>")
