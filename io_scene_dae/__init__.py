@@ -144,7 +144,6 @@ class ExportDAE(bpy.types.Operator, ExportHelper):
 
     @property
     def check_extension(self):
-        # return self.batch_mode == "OFF"
         return True
 
     def execute(self, context):

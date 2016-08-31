@@ -28,7 +28,7 @@ http://www.khronos.org/collada/
 
 import os
 import time
-import math  # math.pi
+import math
 import shutil
 import bpy
 import bmesh
@@ -225,15 +225,6 @@ class DaeExporter:
 
         print("FOR: {}".format(imgpath))
 
-#        if (not os.path.isfile(imgpath)):
-#            print("NOT FILE?")
-#            if imgpath.endswith((".bmp", ".rgb", ".png", ".jpeg", ".jpg",
-#                                 ".jp2", ".tga", ".cin", ".dpx", ".exr",
-#                                 ".hdr", ".tif")):
-#                imgpath="images/"+os.path.basename(imgpath)
-#            else:
-#                imgpath="images/"+image.name+".png"
-
         self.writel(S_IMGS, 1, "<image id=\"{}\" name=\"{}\">".format(
             imgid, image.name))
         self.writel(S_IMGS, 2, "<init_from>{}</init_from>".format(imgpath))
@@ -423,22 +414,15 @@ class DaeExporter:
             mid = self.new_id("morph")
 
             for k in range(0, len(mesh.shape_keys.key_blocks)):
-
                 shape = node.data.shape_keys.key_blocks[k]
                 node.show_only_shape_key = True
                 node.active_shape_key_index = k
                 shape.value = 1.0
                 mesh.update()
-                """
-                oldval = shape.value
-                shape.value = 1.0
-
-                """
                 p = node.data
                 v = node.to_mesh(bpy.context.scene, True, "RENDER")
                 self.temp_meshes.add(v)
                 node.data = v
-#                self.export_node(node, il, shape.name)
                 node.data.update()
                 if (armature and k == 0):
                     md = self.export_mesh(node, armature, k, mid, shape.name)
@@ -450,18 +434,11 @@ class DaeExporter:
                 shape.value = 0.0
                 morph_targets.append(md)
 
-                """
-                shape.value = oldval
-                """
             node.show_only_shape_key = False
             node.active_shape_key_index = 0
 
             self.writel(
                 S_MORPH, 1, "<controller id=\"{}\" name=\"\">".format(mid))
-            # if ("skin_id" in morph_targets[0]):
-            #    self.writel(S_MORPH, 2, "<morph source="#"+morph_targets[0][
-            #    "skin_id"]+"" method="NORMALIZED">")
-            # else:
             self.writel(
                 S_MORPH, 2,
                 "<morph source=\"#{}\" method=\"NORMALIZED\">".format(
@@ -552,7 +529,6 @@ class DaeExporter:
             "use_mesh_modifiers"]
 
         name_to_use = mesh.name
-        # print("name to use: "+mesh.name)
         if (custom_name is not None and custom_name != ""):
             name_to_use = custom_name
 
@@ -593,7 +569,6 @@ class DaeExporter:
                     {"WARNING"},
                     "CalcTangets failed for mesh \"{}\", no tangets will be "
                     "exported.".format(mesh.name))
-                # uv_layer_count=0
                 mesh.calc_normals_split()
                 has_tangents = False
 
@@ -606,9 +581,6 @@ class DaeExporter:
 
             if not (f.material_index in surface_indices):
                 surface_indices[f.material_index] = []
-                # print("Type: " + str(type(f.material_index)))
-                # print("IDX: " + str(f.material_index) + "/" + str(
-                #     len(mesh.materials)))
 
                 try:
                     # Bizarre blender behavior i don't understand,
@@ -627,20 +599,6 @@ class DaeExporter:
             indices = surface_indices[f.material_index]
             vi = []
             # Vertices always 3
-            """
-            if (len(f.vertices)==3):
-                vi.append(0)
-                vi.append(1)
-                vi.append(2)
-            elif (len(f.vertices)==4):
-                #todo, should use shortest path
-                vi.append(0)
-                vi.append(1)
-                vi.append(2)
-                vi.append(0)
-                vi.append(2)
-                vi.append(3)
-            """
 
             for lt in range(f.loop_total):
                 loop_index = f.loop_start + lt
@@ -662,11 +620,6 @@ class DaeExporter:
                 if (has_tangents):
                     v.tangent = Vector(ml.tangent)
                     v.bitangent = Vector(ml.bitangent)
-
-                    # if (armature):
-                    #         v.vertex = node.matrix_world * v.vertex
-
-                # v.color=Vertex(mv. ???
 
                 if armature is not None:
                     wsum = 0.0
@@ -1089,16 +1042,12 @@ class DaeExporter:
         if (node.data.shape_keys is not None):
             sk = node.data.shape_keys
             if (sk.animation_data):
-                    # print("HAS ANIM")
-                    # print("DRIVERS: "+str(len(sk.animation_data.drivers)))
                 for d in sk.animation_data.drivers:
                     if (d.driver):
                         for v in d.driver.variables:
                             for t in v.targets:
                                 if (t.id is not None and
                                         t.id.name in self.scene.objects):
-                                    # print("LINKING " + str(node) + " WITH " +
-                                    #     str(t.id.name))
                                     self.armature_for_morph[
                                         node] = self.scene.objects[t.id.name]
 
@@ -1273,7 +1222,6 @@ class DaeExporter:
         lightid = self.new_id("light")
         self.writel(S_LAMPS, 1, "<light id=\"{}\" name=\"{}\">".format(
                 lightid, light.name))
-        # self.writel(S_LAMPS, 2, "<optics>")
         self.writel(S_LAMPS, 3, "<technique_common>")
 
         if (light.type == "POINT"):
@@ -1313,7 +1261,6 @@ class DaeExporter:
             self.writel(S_LAMPS, 4, "</directional>")
 
         self.writel(S_LAMPS, 3, "</technique_common>")
-        # self.writel(S_LAMPS, 2, "</optics>")
         self.writel(S_LAMPS, 1, "</light>")
 
         self.writel(S_NODES, il, "<instance_light url=\"#{}\"/>".format(
@@ -1515,7 +1462,6 @@ class DaeExporter:
         self.writel(
             S_NODES, il, "<matrix sid=\"transform\">{}</matrix>".format(
                 strmtx(node.matrix_local)))
-        # print("NODE TYPE: "+node.type+" NAME: "+node.name)
         if (node.type == "MESH"):
             self.export_mesh_node(node, il)
         elif (node.type == "CURVE"):
@@ -1543,7 +1489,6 @@ class DaeExporter:
 
         if (self.config["use_active_layers"]):
             valid = False
-            # print("NAME: "+node.name)
             for i in range(20):
                 if (node.layers[i] and self.scene.layers[i]):
                     valid = True
@@ -1724,15 +1669,11 @@ class DaeExporter:
         # Change frames first, export objects last
         # This improves performance enormously
 
-        # print("anim from: " + str(start) + " to " + str(end) + " allowed: " +
-        #     str(allowed))
         for t in range(start, end + 1):
             self.scene.frame_set(t)
             key = t * frame_len - frame_sub
-#            print("Export Anim Frame "+str(t)+"/"+str(self.scene.frame_end+1))
 
             for node in self.scene.objects:
-
                 if (node not in self.valid_nodes):
                     continue
                 if (allowed is not None and not (node in allowed)):
@@ -1743,7 +1684,6 @@ class DaeExporter:
                         # inside of action
                         pass
                     else:
-                        # print("fail "+str((node in self.armature_for_morph)))
                         continue
                 if (node.type == "MESH" and node.data is not None and
                     node.data.shape_keys is not None and (
@@ -1794,7 +1734,6 @@ class DaeExporter:
                         bone_name = self.skeleton_info[node]["bone_ids"][bone]
 
                         if (not (bone_name in xform_cache)):
-                            # print("has bone: " + bone_name)
                             xform_cache[bone_name] = []
 
                         posebone = node.pose.bones[bone.name]
@@ -1892,16 +1831,11 @@ class DaeExporter:
                         for j, bone in enumerate(s.pose.bones):
                             bone.matrix_basis = Matrix()
 
-                # print("allowed skeletons "+str(allowed_skeletons))
-
-                # print(str(x))
-
                 tcn = self.export_animation(int(x.frame_range[0]), int(
                     x.frame_range[1] + 0.5), allowed_skeletons)
                 framelen = (1.0 / self.scene.render.fps)
                 start = x.frame_range[0] * framelen
                 end = x.frame_range[1] * framelen
-                # print("Export anim: "+x.name)
                 self.writel(
                     S_ANIM_CLIPS, 1, "<animation_clip name=\"{}\" "
                     "start=\"{}\" end=\"{}\">".format(x.name, start, end))
