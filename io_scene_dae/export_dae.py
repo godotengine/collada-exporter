@@ -436,6 +436,7 @@ class DaeExporter:
                 """
                 p = node.data
                 v = node.to_mesh(bpy.context.scene, True, "RENDER")
+                self.temp_meshes.add(v)
                 node.data = v
 #                self.export_node(node, il, shape.name)
                 node.data.update()
@@ -557,6 +558,7 @@ class DaeExporter:
 
         mesh = node.to_mesh(self.scene, apply_modifiers,
                             "RENDER")  # is this allright?
+        self.temp_meshes.add(mesh)
 
         triangulate = self.config["use_triangles"]
         if (triangulate):
@@ -2003,7 +2005,7 @@ class DaeExporter:
                  "path", "mesh_cache", "curve_cache", "material_cache",
                  "image_cache", "skeleton_info", "config", "valid_nodes",
                  "armature_for_morph", "used_bones", "wrongvtx_report",
-                 "skeletons", "action_constraints")
+                 "skeletons", "action_constraints", "temp_meshes")
 
     def __init__(self, path, kwargs, operator):
         self.operator = operator
@@ -2013,6 +2015,7 @@ class DaeExporter:
         self.sections = {}
         self.path = path
         self.mesh_cache = {}
+        self.temp_meshes = set()
         self.curve_cache = {}
         self.material_cache = {}
         self.image_cache = {}
@@ -2025,9 +2028,16 @@ class DaeExporter:
         self.skeletons = []
         self.action_constraints = []
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        for mesh in self.temp_meshes:
+            bpy.data.meshes.remove(mesh)
+
 
 def save(operator, context, filepath="", use_selection=False, **kwargs):
-    exp = DaeExporter(filepath, kwargs, operator)
-    exp.export()
+    with DaeExporter(filepath, kwargs, operator) as exp:
+        exp.export()
 
     return {"FINISHED"}  # so the script wont run after we have batch exported.
