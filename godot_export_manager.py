@@ -50,9 +50,7 @@ class godot_export_manager(bpy.types.Panel):
     def draw(self, context):
         """ Draw function for all ui elements """
         layout = self.layout
-        split = self.layout.split()
         scene = bpy.data.scenes[0]
-        ob = context.object
         scene = context.scene
 
         row = layout.row()
@@ -61,13 +59,12 @@ class godot_export_manager(bpy.types.Panel):
 
         row = layout.row()
         col = row.column(align=True)
-        op = col.operator("scene.godot_add_objects_to_group",
-                          text="Add selected objects to Group",
-                          icon="COPYDOWN")
-
-        op = col.operator("scene.godot_delete_objects_from_group",
-                          text="Delete selected objects from Group",
-                          icon="PASTEDOWN")
+        col.operator("scene.godot_add_objects_to_group",
+                     text="Add selected objects to Group",
+                     icon="COPYDOWN")
+        col.operator("scene.godot_delete_objects_from_group",
+                     text="Delete selected objects from Group",
+                     icon="PASTEDOWN")
 
         row = layout.row()
         col = row.column()
@@ -127,8 +124,6 @@ class UI_List_Godot(bpy.types.UIList):
     """ Custom template_list look """
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname, index):
-        ob = data
-        slot = item
         col = layout.row(align=True)
 
         col.label(text=item.name, icon="GROUP")
@@ -309,8 +304,6 @@ class export_group(bpy.types.Operator):
             self.delete_object(group)
 
     def execute(self, context):
-
-        scene = context.scene
         group = context.scene.godot_export_groups
 
         if not group[self.idx].active and self.export_all:

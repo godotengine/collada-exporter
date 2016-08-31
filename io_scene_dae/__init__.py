@@ -38,7 +38,7 @@ bl_info = {
 if "bpy" in locals():
     import imp
     if "export_dae" in locals():
-        imp.reload(export_dae)
+        imp.reload(export_dae)  # noqa
 
 
 class ExportDAE(bpy.types.Operator, ExportHelper):
