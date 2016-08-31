@@ -580,9 +580,6 @@ class DaeExporter:
         if armature is not None:
             si = self.skeleton_info[armature]
 
-        has_uv = False
-        has_uv2 = False
-        has_weights = armature is not None
         has_tangents = self.config["use_tangent_arrays"]  # could detect..
         has_colors = len(mesh.vertex_colors)
         mat_assign = []
@@ -673,7 +670,6 @@ class DaeExporter:
 
                 if armature is not None:
                     wsum = 0.0
-                    zero_bones = []
 
                     for vg in mv.groups:
                         if vg.group >= len(node.vertex_groups):
@@ -1718,7 +1714,6 @@ class DaeExporter:
         frame_orig = self.scene.frame_current
 
         frame_len = 1.0 / self.scene.render.fps
-        frame_total = end - start + 1
         frame_sub = 0
         if (start > 0):
             frame_sub = start * frame_len
