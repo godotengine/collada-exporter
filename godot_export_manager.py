@@ -318,14 +318,10 @@ class export_group(bpy.types.Operator):
 
         path = group[self.idx].export_path
         if (path.find("//") == 0 or path.find("\\\\") == 0):
-            # If relative, convert to absolute
             path = bpy.path.abspath(path)
             path = path.replace("\\", "/")
 
-        # If path exists and group export name is set the group will be
-        # exported
         if os.path.exists(path) and group[self.idx].export_name != "":
-
             context.scene.layers = [True] * 20
 
             if group[self.idx].export_name.endswith(".dae"):

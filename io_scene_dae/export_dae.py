@@ -15,8 +15,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# <pep8 compliant>
-
 # Script copyright (C) Juan Linietsky
 # Contact Info: juan@godotengine.org
 
@@ -173,13 +171,9 @@ class DaeExporter:
 
         imgpath = image.filepath
         if imgpath.startswith("//"):
-            # If relative, convert to absolute
             imgpath = bpy.path.abspath(imgpath)
 
-        # Path is absolute, now do something!
-
         if (self.config["use_copy_images"]):
-            # copy image
             basedir = os.path.join(os.path.dirname(self.path), "images")
             if (not os.path.isdir(basedir)):
                 os.makedirs(basedir)
@@ -191,8 +185,6 @@ class DaeExporter:
                     shutil.copy(imgpath, dstfile)
                 imgpath = os.path.join("images", os.path.basename(imgpath))
             else:
-                # If file is not found save it as png file in the destination
-                # folder
                 img_tmp_path = image.filepath
                 if img_tmp_path.lower().endswith(bpy.path.extensions_image):
                     image.filepath = os.path.join(
@@ -211,14 +203,11 @@ class DaeExporter:
                 image.filepath = img_tmp_path
 
         else:
-            # Export relative, always, no one wants absolute paths.
             try:
-                # Export unix compatible always
                 imgpath = os.path.relpath(
                     imgpath, os.path.dirname(self.path)).replace("\\", "/")
-
             except:
-                # Fails sometimes, not sure why
+                # TODO: Review, not sure why it fails
                 pass
 
         imgid = self.new_id("image")
@@ -269,12 +258,12 @@ class DaeExporter:
             surface_sid = self.new_id("fx_surf")
             self.writel(S_FX, 3, "<newparam sid=\"{}\">".format(surface_sid))
             self.writel(S_FX, 4, "<surface type=\"2D\">")
-            # This is sooo weird
             self.writel(S_FX, 5, "<init_from>{}</init_from>".format(imgid))
             self.writel(S_FX, 5, "<format>A8R8G8B8</format>")
             self.writel(S_FX, 4, "</surface>")
             self.writel(S_FX, 3, "</newparam>")
-            # Sampler, collada sure likes it difficult
+
+            # Sampler
             sampler_sid = self.new_id("fx_sampler")
             self.writel(S_FX, 3, "<newparam sid=\"{}\">".format(sampler_sid))
             self.writel(S_FX, 4, "<sampler2D>")
@@ -295,7 +284,6 @@ class DaeExporter:
         self.writel(S_FX, 3, "<technique sid=\"common\">")
         shtype = "blinn"
         self.writel(S_FX, 4, "<{}>".format(shtype))
-        # Ambient? from where?
 
         self.writel(S_FX, 5, "<emission>")
         if emission_tex is not None:
@@ -303,7 +291,7 @@ class DaeExporter:
                 S_FX, 6, "<texture texture=\"{}\" texcoord=\"CHANNEL1\"/>"
                 .format(emission_tex))
         else:
-            # not totally right but good enough
+            # TODO: More accurate coloring, if possible
             self.writel(S_FX, 6, "<color>{}</color>".format(
                 numarr_alpha(material.diffuse_color, material.emit)))
         self.writel(S_FX, 5, "</emission>")
@@ -382,9 +370,7 @@ class DaeExporter:
         self.writel(S_FX, 2, "</profile_COMMON>")
         self.writel(S_FX, 1, "</effect>")
 
-        # Also export blender material in all it's glory (if set as active)
-
-        # Material
+        # Material (if active)
         matid = self.new_id("material")
         self.writel(S_MATS, 1, "<material id=\"{}\" name=\"{}\">".format(
             matid, material.name))
@@ -408,7 +394,7 @@ class DaeExporter:
             md = None
             for k in range(0, len(mesh.shape_keys.key_blocks)):
                 shape = node.data.shape_keys.key_blocks[k]
-                values += [shape.value]  # save value
+                values += [shape.value]
                 shape.value = 0
 
             mid = self.new_id("morph")
@@ -533,7 +519,7 @@ class DaeExporter:
             name_to_use = custom_name
 
         mesh = node.to_mesh(self.scene, apply_modifiers,
-                            "RENDER")  # is this allright?
+                            "RENDER")  # TODO: Review
         self.temp_meshes.add(mesh)
 
         triangulate = self.config["use_triangles"]
@@ -556,7 +542,9 @@ class DaeExporter:
         if armature is not None:
             si = self.skeleton_info[armature]
 
-        has_tangents = self.config["use_tangent_arrays"]  # could detect..
+        # TODO: Implement automatic tangent detection
+        has_tangents = self.config["use_tangent_arrays"]
+
         has_colors = len(mesh.vertex_colors)
         mat_assign = []
 
@@ -583,8 +571,7 @@ class DaeExporter:
                 surface_indices[f.material_index] = []
 
                 try:
-                    # Bizarre blender behavior i don't understand,
-                    # so catching exception
+                    # TODO: Review, understand why it throws
                     mat = mesh.materials[f.material_index]
                 except:
                     mat = None
@@ -593,12 +580,10 @@ class DaeExporter:
                     materials[f.material_index] = self.export_material(
                         mat, mesh.show_double_sided)
                 else:
-                    # weird, has no material?
                     materials[f.material_index] = None
 
             indices = surface_indices[f.material_index]
             vi = []
-            # Vertices always 3
 
             for lt in range(f.loop_total):
                 loop_index = f.loop_start + lt
@@ -630,8 +615,8 @@ class DaeExporter:
                         name = node.vertex_groups[vg.group].name
 
                         if (name in si["bone_index"]):
-                            # could still put the weight as 0.0001 maybe
-                            # blender has a lot of zero weight stuff
+                            # TODO: Try using 0.0001 since Blender uses
+                            #       zero weight
                             if (vg.weight > 0.001):
                                 v.bones.append(si["bone_index"][name])
                                 v.weights.append(vg.weight)
@@ -645,15 +630,14 @@ class DaeExporter:
                                 "model.".format(node.name))
                             self.wrongvtx_report = True
 
-                        # blender can have bones assigned that weight zero
-                        # so they remain local
-                        # this is the best it can be done?
+                        # TODO: Explore how to deal with zero-weight bones,
+                        #       which remain local
                         v.bones.append(0)
                         v.weights.append(1)
 
                 tup = v.get_tup()
                 idx = 0
-                # do not optmize if using shapekeys
+                # Do not optmize if using shapekeys
                 if (skeyindex == -1 and tup in vertex_map):
                     idx = vertex_map[tup]
                 else:
@@ -663,8 +647,7 @@ class DaeExporter:
 
                 vi.append(idx)
 
-            if (len(vi) > 2):
-                # only triangles and above
+            if (len(vi) > 2):  # Only triangles and above
                 indices.append(vi)
 
         meshid = self.new_id("mesh")
@@ -695,8 +678,7 @@ class DaeExporter:
         self.writel(S_GEOM, 4, "</technique_common>")
         self.writel(S_GEOM, 3, "</source>")
 
-        # Normal Array
-
+        # Normals Array
         self.writel(S_GEOM, 3, "<source id=\"{}-normals\">".format(meshid))
         float_values = ""
         for v in vertices:
@@ -761,9 +743,7 @@ class DaeExporter:
             self.writel(S_GEOM, 3, "</source>")
 
         # UV Arrays
-
         for uvi in range(uv_layer_count):
-
             self.writel(S_GEOM, 3, "<source id=\"{}-texcoord-{}\">".format(
                 meshid, uvi))
             float_values = ""
@@ -771,8 +751,7 @@ class DaeExporter:
                 try:
                     float_values += " {} {}".format(v.uv[uvi].x, v.uv[uvi].y)
                 except:
-                    # I don"t understand this weird multi-uv-layer API, but
-                    # with this it seems to works
+                    # TODO: Review, understand better the multi-uv-layer API
                     float_values += " 0 0 "
 
             self.writel(
@@ -791,7 +770,6 @@ class DaeExporter:
             self.writel(S_GEOM, 3, "</source>")
 
         # Color Arrays
-
         if (has_colors):
             self.writel(S_GEOM, 3, "<source id=\"{}-colors\">".format(meshid))
             float_values = ""
@@ -835,11 +813,12 @@ class DaeExporter:
                 matref = self.new_id("trimat")
                 self.writel(
                     S_GEOM, 3, "<{} count=\"{}\" material=\"{}\">".format(
-                        prim_type, int(len(indices)), matref))  # todo material
+                        prim_type,
+                        int(len(indices)), matref))  # TODO: Implement material
                 mat_assign.append((mat, matref))
             else:
                 self.writel(S_GEOM, 3, "<{} count=\"{}\">".format(
-                    prim_type, int(len(indices))))  # todo material
+                    prim_type, int(len(indices))))  # TODO: Implement material
 
             self.writel(
                 S_GEOM, 4, "<input semantic=\"VERTEX\" "
@@ -893,10 +872,8 @@ class DaeExporter:
             self.mesh_cache[node.data] = meshdata
 
         # Export armature data (if armature exists)
-
         if (armature is not None and (
                 skel_source is not None or skeyindex == -1)):
-
             contid = self.new_id("controller")
 
             self.writel(S_SKIN, 1, "<controller id=\"{}\">".format(contid))
@@ -1072,7 +1049,6 @@ class DaeExporter:
                 meshdata["id"]))
 
         if (len(meshdata["material_assign"]) > 0):
-
             self.writel(S_NODES, il + 1, "<bind_material>")
             self.writel(S_NODES, il + 2, "<technique_common>")
             for m in meshdata["material_assign"]:
@@ -1187,7 +1163,7 @@ class DaeExporter:
         if (camera.type == "PERSP"):
             self.writel(S_CAMS, 4, "<perspective>")
             self.writel(S_CAMS, 5, "<yfov>{}</yfov>".format(
-                    math.degrees(camera.angle)))  # I think?
+                    math.degrees(camera.angle)))  # TODO: Review
             self.writel(S_CAMS, 5, "<aspect_ratio>{}</aspect_ratio>".format(
                 self.scene.render.resolution_x /
                 self.scene.render.resolution_y))
@@ -1198,7 +1174,7 @@ class DaeExporter:
         else:
             self.writel(S_CAMS, 4, "<orthographic>")
             self.writel(S_CAMS, 5, "<xmag>{}</xmag>".format(
-                camera.ortho_scale * 0.5))  # I think?
+                camera.ortho_scale * 0.5))  # TODO: Review
             self.writel(S_CAMS, 5, "<aspect_ratio>{}</aspect_ratio>".format(
                 self.scene.render.resolution_x /
                 self.scene.render.resolution_y))
@@ -1228,7 +1204,7 @@ class DaeExporter:
             self.writel(S_LAMPS, 4, "<point>")
             self.writel(S_LAMPS, 5, "<color>{}</color>".format(
                 strarr(light.color)))
-            # convert to linear attenuation
+            # Convert to linear attenuation
             att_by_distance = 2.0 / light.distance
             self.writel(
                 S_LAMPS, 5,
@@ -1243,7 +1219,7 @@ class DaeExporter:
             self.writel(S_LAMPS, 4, "<spot>")
             self.writel(S_LAMPS, 5, "<color>{}</color>".format(
                 strarr(light.color)))
-            # convert to linear attenuation
+            # Convert to linear attenuation
             att_by_distance = 2.0 / light.distance
             self.writel(
                 S_LAMPS, 5,
@@ -1254,7 +1230,7 @@ class DaeExporter:
                     math.degrees(light.spot_size / 2)))
             self.writel(S_LAMPS, 4, "</spot>")
 
-        else:  # write a sun lamp for everything else (not supported)
+        else:  # Write a sun lamp for everything else (not supported)
             self.writel(S_LAMPS, 4, "<directional>")
             self.writel(S_LAMPS, 5, "<color>{}</color>".format(
                 strarr(light.color)))
@@ -1480,7 +1456,6 @@ class DaeExporter:
 
         il -= 1
         self.writel(S_NODES, il, "</node>")
-        # make previous node active again
         bpy.context.scene.objects.active = prev_node
 
     def is_node_valid(self, node):
@@ -1507,7 +1482,6 @@ class DaeExporter:
             S_NODES, 1, "<visual_scene id=\"{}\" name=\"scene\">".format(
                 self.scene_name))
 
-        # validate nodes
         for obj in self.scene.objects:
             if (obj in self.valid_nodes):
                 continue
@@ -1652,9 +1626,9 @@ class DaeExporter:
         return [anim_id]
 
     def export_animation(self, start, end, allowed=None):
-        # Blender -> Collada frames needs a little work
-        # Collada starts from 0, blender usually from 1
-        # The last frame must be included also
+        # TODO: Blender -> Collada frames needs a little work
+        #       Collada starts from 0, blender usually from 1.
+        #       The last frame must be included also
 
         frame_orig = self.scene.frame_current
 
@@ -1666,9 +1640,8 @@ class DaeExporter:
         tcn = []
         xform_cache = {}
         blend_cache = {}
-        # Change frames first, export objects last
-        # This improves performance enormously
 
+        # Change frames first, export objects last, boosts performance
         for t in range(start, end + 1):
             self.scene.frame_set(t)
             key = t * frame_len - frame_sub
@@ -1680,8 +1653,6 @@ class DaeExporter:
                     if (node.type == "MESH" and node.data is not None and
                         (node in self.armature_for_morph) and (
                             self.armature_for_morph[node] in allowed)):
-                        # all good you pass with flying colors for morphs
-                        # inside of action
                         pass
                     else:
                         continue
@@ -1704,9 +1675,8 @@ class DaeExporter:
 
                 if (node.type == "MESH" and node.parent and
                         node.parent.type == "ARMATURE"):
-
                     # In Collada, nodes that have skin modifier must not export
-                    # animation, animate the skin instead.
+                    # animation, animate the skin instead
                     continue
 
                 if (len(node.constraints) > 0 or
@@ -1725,7 +1695,6 @@ class DaeExporter:
 
                 if (node.type == "ARMATURE"):
                     # All bones exported for now
-
                     for bone in node.data.bones:
                         if((bone.name.startswith("ctrl") and
                                 self.config["use_exclude_ctrl_bones"])):
@@ -1768,7 +1737,7 @@ class DaeExporter:
 
         self.scene.frame_set(frame_orig)
 
-        # export animation xml
+        # Export animation XML
         for nid in xform_cache:
             tcn += self.export_animation_transform_channel(
                 nid, xform_cache[nid], True)
@@ -1807,7 +1776,7 @@ class DaeExporter:
                     continue
 
                 bones = []
-                # find bones used
+                # Find bones used
                 for p in x.fcurves:
                     dp = p.data_path
                     base = "pose.bones[\""
@@ -1880,13 +1849,12 @@ class DaeExporter:
 
         self.writel(S_GEOM, 0, "</library_geometries>")
 
-        # morphs always go before skin controllers
+        # Morphs always go before skin controllers
         if S_MORPH in self.sections:
             for l in self.sections[S_MORPH]:
                 self.writel(S_CONT, 0, l)
             del self.sections[S_MORPH]
 
-        # morphs always go before skin controllers
         if S_SKIN in self.sections:
             for l in self.sections[S_SKIN]:
                 self.writel(S_CONT, 0, l)
@@ -1969,4 +1937,4 @@ def save(operator, context, filepath="", use_selection=False, **kwargs):
     with DaeExporter(filepath, kwargs, operator) as exp:
         exp.export()
 
-    return {"FINISHED"}  # so the script wont run after we have batch exported.
+    return {"FINISHED"}
