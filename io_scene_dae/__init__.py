@@ -15,8 +15,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# <pep8-80 compliant>
-
 import bpy
 from bpy.props import StringProperty, BoolProperty, FloatProperty, EnumProperty
 
@@ -51,8 +49,7 @@ class ExportDAE(bpy.types.Operator, ExportHelper):
     filter_glob = StringProperty(default="*.dae", options={"HIDDEN"})
 
     # List of operator properties, the attributes will be assigned
-    # to the class instance from the operator settings before calling.
-
+    # to the class instance from the operator settings before calling
     object_types = EnumProperty(
         name="Object Types",
         options={"ENUM_FLAG"},
