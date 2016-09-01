@@ -147,13 +147,6 @@ class ExportDAE(bpy.types.Operator, ExportHelper):
         if not self.filepath:
             raise Exception("filepath not set")
 
-        """        global_matrix = Matrix()
-
-                global_matrix[0][0] = \
-                global_matrix[1][1] = \
-                global_matrix[2][2] = self.global_scale
-        """
-
         keywords = self.as_keywords(ignore=("axis_forward",
                                             "axis_up",
                                             "global_scale",
