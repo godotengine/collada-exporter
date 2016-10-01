@@ -91,6 +91,11 @@ class ExportDAE(bpy.types.Operator, ExportHelper):
         description="Copy Images (create images/ subfolder)",
         default=False,
         )
+    use_gamma_correction = BoolProperty(
+        name="Apply Gamma Correction",
+        description="Applies Gamma Correction of 2.2 to the Colours",
+        default=True,
+        )
     use_active_layers = BoolProperty(
         name="Active Layers",
         description="Export only objects on the active layers.",
