@@ -1451,7 +1451,7 @@ class DaeExporter:
         elif (node.type == "EMPTY"):
             self.export_empty_node(node, il)
 
-        for x in node.children:
+        for x in sorted(node.children, key=lambda x: x.name):
             self.export_node(x, il)
 
         il -= 1
@@ -1492,7 +1492,7 @@ class DaeExporter:
                         self.valid_nodes.append(n)
                     n = n.parent
 
-        for obj in self.scene.objects:
+        for obj in sorted(self.scene.objects, key=lambda x: x.name):
             if (obj in self.valid_nodes and obj.parent is None):
                 self.export_node(obj, 2)
 
