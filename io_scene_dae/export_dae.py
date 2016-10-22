@@ -615,12 +615,13 @@ class DaeExporter:
                         name = node.vertex_groups[vg.group].name
 
                         if (name in si["bone_index"]):
-                            # TODO: Try using 0.0001 since Blender uses
-                            #       zero weight
-                            if (vg.weight > 0.001):
-                                v.bones.append(si["bone_index"][name])
-                                v.weights.append(vg.weight)
-                                wsum += vg.weight
+                            # Using 0.001 since Blender uses zero weight
+                            if (vg.weight < 0.001):
+                                vg.weight = 0.001
+
+                            v.bones.append(si["bone_index"][name])
+                            v.weights.append(vg.weight)
+                            wsum += vg.weight
                     if (wsum == 0.0):
                         if not self.wrongvtx_report:
                             self.operator.report(
