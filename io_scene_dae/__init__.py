@@ -133,6 +133,12 @@ class ExportDAE(bpy.types.Operator, ExportHelper):
         default=6.0,
         )
 
+    use_shape_key_export = BoolProperty(
+        name="Shape Keys",
+        description="Export shape keys for selected objects.",
+        default=False,
+        )
+
     use_metadata = BoolProperty(
         name="Use Metadata",
         default=True,
