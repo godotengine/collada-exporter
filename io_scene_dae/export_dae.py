@@ -388,7 +388,7 @@ class DaeExporter:
             return self.mesh_cache[mesh]
 
         if (skeyindex == -1 and mesh.shape_keys is not None and len(
-                mesh.shape_keys.key_blocks)):
+                mesh.shape_keys.key_blocks) and self.config["use_shape_key_export"]):
             values = []
             morph_targets = []
             md = None
