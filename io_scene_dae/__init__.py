@@ -125,6 +125,12 @@ class ExportDAE(bpy.types.Operator, ExportHelper):
         default=True,
         )
 
+    use_shape_key_export = BoolProperty(
+        name="Shape Keys",
+        description="Export shape keys for selected objects.",
+        default=False,
+        )
+		
     anim_optimize_precision = FloatProperty(
         name="Precision",
         description=("Tolerence for comparing double keyframes "
@@ -132,12 +138,6 @@ class ExportDAE(bpy.types.Operator, ExportHelper):
         min=1, max=16,
         soft_min=1, soft_max=16,
         default=6.0,
-        )
-
-    use_shape_key_export = BoolProperty(
-        name="Shape Keys",
-        description="Export shape keys for selected objects.",
-        default=False,
         )
 
     use_metadata = BoolProperty(
