@@ -1067,8 +1067,8 @@ class DaeExporter:
 
     def export_armature_bone(self, bone, il, si):
         is_ctrl_bone = (
-            bone.name.startswith("ctrl") and
-            self.config["use_exclude_ctrl_bones"])
+            self.config["use_exclude_ctrl_bones"] and
+            (bone.name.startswith("ctrl") or bone.use_deform == False))
         if (bone.parent is None and is_ctrl_bone is True):
             self.operator.report(
                 {"WARNING"}, "Root bone cannot be a control bone.")
@@ -1696,8 +1696,9 @@ class DaeExporter:
                 if (node.type == "ARMATURE"):
                     # All bones exported for now
                     for bone in node.data.bones:
-                        if((bone.name.startswith("ctrl") and
-                                self.config["use_exclude_ctrl_bones"])):
+                        if((bone.name.startswith("ctrl") or
+                            bone.use_deform == False) and
+                                self.config["use_exclude_ctrl_bones"]):
                             continue
 
                         bone_name = self.skeleton_info[node]["bone_ids"][bone]
@@ -1712,8 +1713,10 @@ class DaeExporter:
                         if (bone.parent):
                             if (self.config["use_exclude_ctrl_bones"]):
                                 current_parent_posebone = bone.parent
-                                while (current_parent_posebone.name
-                                        .startswith("ctrl") and
+                                while ((current_parent_posebone.name
+                                        .startswith("ctrl") or
+                                        current_parent_posebone.use_deform
+                                        == False) and
                                         current_parent_posebone.parent):
                                     current_parent_posebone = (
                                         current_parent_posebone.parent)
