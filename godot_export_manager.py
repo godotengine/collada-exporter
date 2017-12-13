@@ -106,6 +106,7 @@ class godot_export_manager(bpy.types.Panel):
             row = layout.row()
             col = row.column()
 
+            col.prop(group, "use_move_to_center")
             col.prop(group, "use_include_particle_duplicates")
             col.prop(group, "use_mesh_modifiers")
             col.prop(group, "use_tangent_arrays")
@@ -365,6 +366,9 @@ class export_group(bpy.types.Operator):
                 else:
                     bpy.data.objects[object.name].select = True
 
+            if group[self.idx].use_move_to_center:
+                bpy.ops.object.location_clear()
+
             bpy.ops.object.transform_apply(location=group[self.idx].apply_loc,
                                            rotation=group[self.idx].apply_rot,
                                            scale=group[self.idx].apply_scale)
@@ -519,6 +523,9 @@ class godot_export_groups(bpy.types.PropertyGroup):
                                 options={"HIDDEN"})
     use_include_particle_duplicates = BoolProperty(
         name="Include Particle Duplicates", default=True)
+
+    use_move_to_center = BoolProperty(
+        name="Move Objects to Center", default=False)
 
 
 def register():
