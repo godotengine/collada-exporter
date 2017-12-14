@@ -1309,12 +1309,13 @@ class DaeExporter:
                 splineid, len(points), position_values))
         self.writel(S_GEOM, 4, "<technique_common>")
         self.writel(
-            S_GEOM, 4, "<accessor source=\"#{}-positions-array\" "
+            S_GEOM, 5, "<accessor source=\"#{}-positions-array\" "
             "count=\"{}\" stride=\"3\">".format(splineid, len(points) / 3))
-        self.writel(S_GEOM, 5, "<param name=\"X\" type=\"float\"/>")
-        self.writel(S_GEOM, 5, "<param name=\"Y\" type=\"float\"/>")
-        self.writel(S_GEOM, 5, "<param name=\"Z\" type=\"float\"/>")
-        self.writel(S_GEOM, 4, "</accessor>")
+        self.writel(S_GEOM, 6, "<param name=\"X\" type=\"float\"/>")
+        self.writel(S_GEOM, 6, "<param name=\"Y\" type=\"float\"/>")
+        self.writel(S_GEOM, 6, "<param name=\"Z\" type=\"float\"/>")
+        self.writel(S_GEOM, 5, "</accessor>")
+        self.writel(S_GEOM, 4, "</technique_common>")
         self.writel(S_GEOM, 3, "</source>")
 
         self.writel(
@@ -1328,12 +1329,13 @@ class DaeExporter:
                 splineid, len(points), intangent_values))
         self.writel(S_GEOM, 4, "<technique_common>")
         self.writel(
-            S_GEOM, 4, "<accessor source=\"#{}-intangents-array\" "
+            S_GEOM, 5, "<accessor source=\"#{}-intangents-array\" "
             "count=\"{}\" stride=\"3\">".format(splineid, len(points) / 3))
-        self.writel(S_GEOM, 5, "<param name=\"X\" type=\"float\"/>")
-        self.writel(S_GEOM, 5, "<param name=\"Y\" type=\"float\"/>")
-        self.writel(S_GEOM, 5, "<param name=\"Z\" type=\"float\"/>")
-        self.writel(S_GEOM, 4, "</accessor>")
+        self.writel(S_GEOM, 6, "<param name=\"X\" type=\"float\"/>")
+        self.writel(S_GEOM, 6, "<param name=\"Y\" type=\"float\"/>")
+        self.writel(S_GEOM, 6, "<param name=\"Z\" type=\"float\"/>")
+        self.writel(S_GEOM, 5, "</accessor>")
+        self.writel(S_GEOM, 4, "</technique_common>")
         self.writel(S_GEOM, 3, "</source>")
 
         self.writel(S_GEOM, 3, "<source id=\"{}-outtangents\">".format(
@@ -1347,12 +1349,13 @@ class DaeExporter:
                 splineid, len(points), outtangent_values))
         self.writel(S_GEOM, 4, "<technique_common>")
         self.writel(
-            S_GEOM, 4, "<accessor source=\"#{}-outtangents-array\" "
+            S_GEOM, 5, "<accessor source=\"#{}-outtangents-array\" "
             "count=\"{}\" stride=\"3\">".format(splineid, len(points) / 3))
-        self.writel(S_GEOM, 5, "<param name=\"X\" type=\"float\"/>")
-        self.writel(S_GEOM, 5, "<param name=\"Y\" type=\"float\"/>")
-        self.writel(S_GEOM, 5, "<param name=\"Z\" type=\"float\"/>")
-        self.writel(S_GEOM, 4, "</accessor>")
+        self.writel(S_GEOM, 6, "<param name=\"X\" type=\"float\"/>")
+        self.writel(S_GEOM, 6, "<param name=\"Y\" type=\"float\"/>")
+        self.writel(S_GEOM, 6, "<param name=\"Z\" type=\"float\"/>")
+        self.writel(S_GEOM, 5, "</accessor>")
+        self.writel(S_GEOM, 4, "</technique_common>")
         self.writel(S_GEOM, 3, "</source>")
 
         self.writel(
@@ -1366,10 +1369,11 @@ class DaeExporter:
             .format(splineid, len(interps), interpolation_values))
         self.writel(S_GEOM, 4, "<technique_common>")
         self.writel(
-            S_GEOM, 4, "<accessor source=\"#{}-interpolations-array\" "
+            S_GEOM, 5, "<accessor source=\"#{}-interpolations-array\" "
             "count=\"{}\" stride=\"1\">".format(splineid, len(interps)))
-        self.writel(S_GEOM, 5, "<param name=\"INTERPOLATION\" type=\"name\"/>")
-        self.writel(S_GEOM, 4, "</accessor>")
+        self.writel(S_GEOM, 6, "<param name=\"INTERPOLATION\" type=\"name\"/>")
+        self.writel(S_GEOM, 5, "</accessor>")
+        self.writel(S_GEOM, 4, "</technique_common>")
         self.writel(S_GEOM, 3, "</source>")
 
         self.writel(S_GEOM, 3, "<source id=\"{}-tilts\">".format(splineid))
@@ -1382,10 +1386,11 @@ class DaeExporter:
             .format(splineid, len(tilts), tilt_values))
         self.writel(S_GEOM, 4, "<technique_common>")
         self.writel(
-            S_GEOM, 4, "<accessor source=\"#{}-tilts-array\" "
+            S_GEOM, 5, "<accessor source=\"#{}-tilts-array\" "
             "count=\"{}\" stride=\"1\">".format(splineid, len(tilts)))
-        self.writel(S_GEOM, 5, "<param name=\"TILT\" type=\"float\"/>")
-        self.writel(S_GEOM, 4, "</accessor>")
+        self.writel(S_GEOM, 6, "<param name=\"TILT\" type=\"float\"/>")
+        self.writel(S_GEOM, 5, "</accessor>")
+        self.writel(S_GEOM, 4, "</technique_common>")
         self.writel(S_GEOM, 3, "</source>")
 
         self.writel(S_GEOM, 3, "<control_vertices>")
