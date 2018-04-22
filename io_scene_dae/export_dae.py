@@ -511,6 +511,21 @@ class DaeExporter:
             self.mesh_cache[node.data] = meshdata
             return meshdata
 
+
+        armature_modifier = None
+
+        armature_poses = None
+
+        if(self.config["use_exclude_armature_modifier"]):
+            armature_modifier = node.modifiers.get("Armature")
+        
+        if(armature_modifier):
+        	#doing this per object is inefficient, should be improved, maybe?
+            armature_poses = [arm.pose_position for arm in bpy.data.armatures]
+            for arm in bpy.data.armatures:
+                arm.pose_position = "REST"
+
+
         apply_modifiers = len(node.modifiers) and self.config[
             "use_mesh_modifiers"]
 
@@ -520,8 +535,13 @@ class DaeExporter:
 
         mesh = node.to_mesh(self.scene, apply_modifiers,
                             "RENDER")  # TODO: Review
-        self.temp_meshes.add(mesh)
+        if(armature_modifier):
+            for i,arm in enumerate(bpy.data.armatures):
+                arm.pose_position = armature_poses[i]
 
+
+
+        self.temp_meshes.add(mesh)
         triangulate = self.config["use_triangles"]
         if (triangulate):
             bm = bmesh.new()

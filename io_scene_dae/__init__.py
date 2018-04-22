@@ -74,6 +74,12 @@ class ExportDAE(bpy.types.Operator, ExportHelper):
         description="Apply modifiers to mesh objects (on a copy!).",
         default=False,
         )
+    use_exclude_armature_modifier = BoolProperty(
+        name="Exclude Armature Modifier",
+        description="Exclude the armature modifier when applying modifiers "
+                      "(otherwise animation will be applied on top of the last pose)",
+        default=True,
+        )
     use_tangent_arrays = BoolProperty(
         name="Tangent Arrays",
         description="Export Tangent and Binormal arrays "
