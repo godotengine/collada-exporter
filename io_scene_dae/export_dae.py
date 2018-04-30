@@ -297,8 +297,13 @@ class DaeExporter:
         self.writel(S_FX, 5, "</emission>")
 
         self.writel(S_FX, 5, "<ambient>")
+        if self.scene.world:
+            ambient_color = self.scene.world.ambient_color
+        else:
+            ambient_color = (0,0,0)
         self.writel(S_FX, 6, "<color>{}</color>".format(
-            numarr_alpha(self.scene.world.ambient_color, material.ambient)))
+            numarr_alpha(ambient_color, material.ambient)))
+            
         self.writel(S_FX, 5, "</ambient>")
 
         self.writel(S_FX, 5, "<diffuse>")
