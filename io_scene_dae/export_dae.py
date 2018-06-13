@@ -1452,6 +1452,9 @@ class DaeExporter:
         if (node not in self.valid_nodes):
             return
 
+        if (self.config["use_node_skip_noexp"] and node.name.endswith("-noexp")):
+            return
+
         prev_node = bpy.context.scene.objects.active
         bpy.context.scene.objects.active = node
 

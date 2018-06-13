@@ -102,6 +102,12 @@ class ExportDAE(bpy.types.Operator, ExportHelper):
         description="Export only objects on the active layers.",
         default=True,
         )
+    use_node_skip_noexp = BoolProperty(
+        name="Skip (-noexp) Nodes",
+        description="Skip exporting of nodes whose name end in (-noexp)."
+                    " Useful to skip lights, etc. which were only used for modelling.",
+        default=True,
+        )
     use_exclude_ctrl_bones = BoolProperty(
         name="Exclude Control Bones",
         description=("Exclude skeleton bones with names beginning with 'ctrl' "
