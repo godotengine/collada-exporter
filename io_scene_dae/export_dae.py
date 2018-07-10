@@ -186,7 +186,8 @@ class DaeExporter:
                 imgpath = os.path.join("images", os.path.basename(imgpath))
             else:
                 img_tmp_path = image.filepath
-                if img_tmp_path.lower().endswith(bpy.path.extensions_image):
+                if img_tmp_path.lower().endswith(
+                    tuple(bpy.path.extensions_image)):
                     image.filepath = os.path.join(
                         basedir, os.path.basename(img_tmp_path))
                 else:
@@ -518,7 +519,7 @@ class DaeExporter:
 
         if(self.config["use_exclude_armature_modifier"]):
             armature_modifier = node.modifiers.get("Armature")
-        
+
         if(armature_modifier):
         	#doing this per object is inefficient, should be improved, maybe?
             armature_poses = [arm.pose_position for arm in bpy.data.armatures]
