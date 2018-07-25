@@ -57,7 +57,6 @@ def snap_tup(tup):
 
     return tup
 
-
 def strmtx(mtx):
     s = ""
     for x in range(4):
@@ -66,34 +65,31 @@ def strmtx(mtx):
     s = " {} ".format(s)
     return s
 
-
-def numarr(a, mult=1.0):
-    s = " "
-    for x in a:
-        s += " {}".format(x * mult)
-    s += " "
-    return s
-
-
-def numarr_alpha(a, mult=1.0):
-    s = " "
-    for x in a:
-        s += " {}".format(x * mult)
-    if len(a) == 3:
-        s += " 1.0"
-    s += " "
-    return s
-
-
-def strarr(arr):
-    s = " "
-    for x in arr:
-        s += " {}".format(x)
-    s += " "
-    return s
-
-
 class DaeExporter:
+
+    def strfloat4(self, vector, alpha=1.0):
+        s = self.strfloat3(vector[:3])
+        if len(vector) == 3:
+            s += "{} ".format(alpha)
+        else:
+            s += "{} ".format(vector[3])
+
+        return s
+
+    def strfloat3(self, vector):
+        s = ""
+        if (self.config["use_gamma_correction"]):
+            s = " ".join([str(self.apply_gamma(x)) for x in vector])
+        else:
+            s = " ".join([str(x) for x in vector])
+        
+        s = " {} ".format(s)
+        return s
+
+    def apply_gamma(self, c):
+        # gamma correction of 2.2
+        gamma = 0.454545454545; # 1/2.2
+        return pow(c, gamma)
 
     def validate_id(self, d):
         if (d.find("id-") == 0):
@@ -294,12 +290,12 @@ class DaeExporter:
         else:
             # TODO: More accurate coloring, if possible
             self.writel(S_FX, 6, "<color>{}</color>".format(
-                numarr_alpha(material.diffuse_color, material.emit)))
+                self.strfloat4(material.diffuse_color, material.emit)))
         self.writel(S_FX, 5, "</emission>")
 
         self.writel(S_FX, 5, "<ambient>")
         self.writel(S_FX, 6, "<color>{}</color>".format(
-            numarr_alpha(self.scene.world.ambient_color, material.ambient)))
+            self.strfloat4(self.scene.world.ambient_color, material.ambient)))
         self.writel(S_FX, 5, "</ambient>")
 
         self.writel(S_FX, 5, "<diffuse>")
@@ -308,7 +304,7 @@ class DaeExporter:
                 S_FX, 6, "<texture texture=\"{}\" texcoord=\"CHANNEL1\"/>"
                 .format(diffuse_tex))
         else:
-            self.writel(S_FX, 6, "<color>{}</color>".format(numarr_alpha(
+            self.writel(S_FX, 6, "<color>{}</color>".format(self.strfloat4(
                 material.diffuse_color, material.diffuse_intensity)))
         self.writel(S_FX, 5, "</diffuse>")
 
@@ -319,7 +315,7 @@ class DaeExporter:
                 "<texture texture=\"{}\" texcoord=\"CHANNEL1\"/>".format(
                     specular_tex))
         else:
-            self.writel(S_FX, 6, "<color>{}</color>".format(numarr_alpha(
+            self.writel(S_FX, 6, "<color>{}</color>".format(self.strfloat4(
                 material.specular_color, material.specular_intensity)))
         self.writel(S_FX, 5, "</specular>")
 
@@ -330,7 +326,7 @@ class DaeExporter:
 
         self.writel(S_FX, 5, "<reflective>")
         self.writel(S_FX, 6, "<color>{}</color>".format(
-            numarr_alpha(material.mirror_color)))
+            self.strfloat4(material.mirror_color)))
         self.writel(S_FX, 5, "</reflective>")
 
         if (material.use_transparency):
@@ -1224,7 +1220,7 @@ class DaeExporter:
         if (light.type == "POINT"):
             self.writel(S_LAMPS, 4, "<point>")
             self.writel(S_LAMPS, 5, "<color>{}</color>".format(
-                strarr(light.color)))
+                self.strfloat3(light.color)))
             # Convert to linear attenuation
             att_by_distance = 2.0 / light.distance
             self.writel(
@@ -1239,7 +1235,7 @@ class DaeExporter:
         elif (light.type == "SPOT"):
             self.writel(S_LAMPS, 4, "<spot>")
             self.writel(S_LAMPS, 5, "<color>{}</color>".format(
-                strarr(light.color)))
+                self.strfloat3(light.color)))
             # Convert to linear attenuation
             att_by_distance = 2.0 / light.distance
             self.writel(
@@ -1254,7 +1250,7 @@ class DaeExporter:
         else:  # Write a sun lamp for everything else (not supported)
             self.writel(S_LAMPS, 4, "<directional>")
             self.writel(S_LAMPS, 5, "<color>{}</color>".format(
-                strarr(light.color)))
+                self.strfloat3(light.color)))
             self.writel(S_LAMPS, 4, "</directional>")
 
         self.writel(S_LAMPS, 3, "</technique_common>")
