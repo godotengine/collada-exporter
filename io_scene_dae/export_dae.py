@@ -1666,7 +1666,12 @@ class DaeExporter:
         tcn = []
         xform_cache = {}
         blend_cache = {}
-
+        
+        # Blender updates drivers with one frame delay, causing the first frame to be wrong in the exported clip
+        # Jumping to the two first frames before exporting the clip fixes this issue
+        self.scene.frame_set(start)
+        self.scene.frame_set(start + 1)
+        
         # Change frames first, export objects last, boosts performance
         for t in range(start, end + 1):
             self.scene.frame_set(t)
