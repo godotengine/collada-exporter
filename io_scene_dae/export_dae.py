@@ -1865,6 +1865,9 @@ class DaeExporter:
         self.writel(S_ANIM, 0, "</library_animations>")
 
     def export(self):
+
+        bpy.ops.object.mode_set(mode = 'OBJECT')
+        
         self.writel(S_GEOM, 0, "<library_geometries>")
         self.writel(S_CONT, 0, "<library_controllers>")
         self.writel(S_CAMS, 0, "<library_cameras>")
