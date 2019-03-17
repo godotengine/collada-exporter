@@ -1803,6 +1803,18 @@ class DaeExporter:
                 if (self.config["use_anim_skip_noexp"] and
                         x.name.endswith("-noexp")):
                     continue
+                    
+                # Before get anim keys, select current action with current strip
+                ob = bpy.context.object
+                ad = ob.animation_data
+                if ad:
+                    for i, track in enumerate(ad.nla_tracks):
+                        # nla track is current action?
+                        if x in list(map(lambda x:x.action, track.strips.values())):
+                            track.select = True
+                            track.is_solo = True
+                            ad.nla_tracks.active = track
+                            break
 
                 bones = []
                 # Find bones used
