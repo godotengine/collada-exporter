@@ -414,16 +414,17 @@ class DaeExporter:
                 
                 if(self.config["use_exclude_armature_modifier"]):
                     armature_modifiers = [i for i in node.modifiers if i.type == "ARMATURE"]
-                    armature_modifier = armature_modifiers[0]#node.modifiers.get("Armature")
+                    if len(armature_modifiers) > 0:
+                        armature_modifier = armature_modifiers[0]#node.modifiers.get("Armature")
 
                 if(armature_modifier):  
                     # the armature modifier must be disabled too
                     armature_modifier_state = armature_modifier.show_viewport
                     armature_modifier.show_viewport = False         
                 
-                v = node.to_mesh(bpy.context.depsgraph, True, calc_undeformed=False) 
-                # Warning, Blender 2.8 does not support anymore the "RENDER" argument to apply modifier
-                # with render state only...
+                depsgraph = bpy.context.evaluated_depsgraph_get()
+                object_eval = node.evaluated_get(depsgraph)
+                v = object_eval.to_mesh()
                 
                 armature_modifier.show_viewport = armature_modifier_state
                 
@@ -538,7 +539,8 @@ class DaeExporter:
         
         if(self.config["use_exclude_armature_modifier"]):
             armature_modifiers = [i for i in node.modifiers if i.type == "ARMATURE"]
-            armature_modifier = armature_modifiers[0]#node.modifiers.get("Armature")
+            if len(armature_modifiers) > 0:
+                armature_modifier = armature_modifiers[0]#node.modifiers.get("Armature")
 
         # Set armature in rest pose
         if(armature_modifier):  
@@ -556,10 +558,10 @@ class DaeExporter:
         name_to_use = mesh.name
         if (custom_name is not None and custom_name != ""):
             name_to_use = custom_name
-
-        mesh = node.to_mesh(bpy.context.depsgraph, apply_modifiers, calc_undeformed=False) 
-        # 2.8 update: warning, Blender does not support anymore the "RENDER" argument to apply modifier
-        # with render state, only current state
+ 
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        object_eval = node.evaluated_get(depsgraph)
+        mesh = object_eval.to_mesh()
         
         # Restore armature and modifier state
         if(armature_modifier):          
@@ -627,7 +629,7 @@ class DaeExporter:
                 
                 if (mat is not None):               
                     materials[f.material_index] = self.export_material(
-                        mat, mesh.show_double_sided)
+                        mat, False)
                 else:
                     materials[f.material_index] = None
 
@@ -1998,9 +2000,8 @@ class DaeExporter:
         return self
 
     def __exit__(self, *exc):
-        for mesh in self.temp_meshes:
-            bpy.data.meshes.remove(mesh)
-
+        for obj in self.scene.objects:
+            obj.to_mesh_clear()
 
 def save(operator, context, filepath="", use_selection=False, **kwargs):
     with DaeExporter(filepath, kwargs, operator) as exp:
