@@ -20,6 +20,7 @@
 
 """
 This script is an exporter to the Khronos Collada file format.
+
 http://www.khronos.org/collada/
 """
 
@@ -30,6 +31,7 @@ import shutil
 import bpy
 import bmesh
 from mathutils import Vector, Matrix
+from bpy_extras import node_shader_utils
 
 # According to collada spec, order matters
 S_ASSET = 0
@@ -171,7 +173,7 @@ class DaeExporter:
         imgpath = image.filepath
         if imgpath.startswith("//"):
             imgpath = bpy.path.abspath(imgpath)
-
+            print("exporting image path", imgpath)
         if (self.config["use_copy_images"]):
             basedir = os.path.join(os.path.dirname(self.path), "images")
             if (not os.path.isdir(basedir)):
@@ -202,6 +204,7 @@ class DaeExporter:
                     "images", os.path.basename(image.filepath))
                 image.filepath = img_tmp_path
 
+        
         else:
             try:
                 imgpath = os.path.relpath(
@@ -209,7 +212,7 @@ class DaeExporter:
             except:
                 # TODO: Review, not sure why it fails
                 pass
-
+        
         imgid = self.new_id("image")
 
         print("FOR: {}".format(imgpath))
@@ -239,6 +242,51 @@ class DaeExporter:
         normal_tex = None
         
         #TODO, use Blender 2.8 principled shader and connected maps
+        mat_wrap = node_shader_utils.PrincipledBSDFWrapper(material) if material else None
+        
+        if mat_wrap:
+            textures_keys = ["base_color_texture", "specular_texture", "normalmap_texture"]
+            
+            for i, tkey in enumerate(textures_keys):
+                tex = getattr(mat_wrap, tkey, None)
+                if tex == None:
+                    continue
+                if tex.image == None:
+                    continue
+
+                # Image
+                imgid = self.export_image(tex.image)
+                
+                # Surface
+                surface_sid = self.new_id("fx_surf")
+                self.writel(S_FX, 3, "<newparam sid=\"{}\">".format(surface_sid))
+                self.writel(S_FX, 4, "<surface type=\"2D\">")
+                self.writel(S_FX, 5, "<init_from>{}</init_from>".format(imgid))
+                self.writel(S_FX, 5, "<format>A8R8G8B8</format>")
+                self.writel(S_FX, 4, "</surface>")
+                self.writel(S_FX, 3, "</newparam>")
+                
+                # Sampler
+                sampler_sid = self.new_id("fx_sampler")
+                self.writel(S_FX, 3, "<newparam sid=\"{}\">".format(sampler_sid))
+                self.writel(S_FX, 4, "<sampler2D>")
+                self.writel(S_FX, 5, "<source>{}</source>".format(surface_sid))
+                self.writel(S_FX, 4, "</sampler2D>")
+                self.writel(S_FX, 3, "</newparam>")
+                sampler_table[i] = sampler_sid
+                
+                if tkey == "base_color_texture" and diffuse_tex is None:
+                    diffuse_tex = sampler_sid
+                if tkey == "specular_texture" and specular_tex is None:
+                    specular_tex = sampler_sid
+                """
+                # TODO differently, no emission input in the principled shader
+                if ts.use_map_emit and emission_tex is None:
+                    emission_tex = sampler_sid
+                """
+                if tkey == "normalmap_texture" and normal_tex is None:
+                    normal_tex = sampler_sid
+        
         """
         for i in range(len(material.texture_slots)):
             ts = material.texture_slots[i]
@@ -250,10 +298,13 @@ class DaeExporter:
                 continue
             if ts.texture.type != "IMAGE":
                 continue
+
             if ts.texture.image is None:
                 continue
+
             # Image
             imgid = self.export_image(ts.texture.image)
+
             # Surface
             surface_sid = self.new_id("fx_surf")
             self.writel(S_FX, 3, "<newparam sid=\"{}\">".format(surface_sid))
@@ -262,6 +313,7 @@ class DaeExporter:
             self.writel(S_FX, 5, "<format>A8R8G8B8</format>")
             self.writel(S_FX, 4, "</surface>")
             self.writel(S_FX, 3, "</newparam>")
+
             # Sampler
             sampler_sid = self.new_id("fx_sampler")
             self.writel(S_FX, 3, "<newparam sid=\"{}\">".format(sampler_sid))
@@ -270,6 +322,7 @@ class DaeExporter:
             self.writel(S_FX, 4, "</sampler2D>")
             self.writel(S_FX, 3, "</newparam>")
             sampler_table[i] = sampler_sid
+
             if ts.use_map_color_diffuse and diffuse_tex is None:
                 diffuse_tex = sampler_sid
             if ts.use_map_color_spec and specular_tex is None:
@@ -279,6 +332,7 @@ class DaeExporter:
             if ts.use_map_normal and normal_tex is None:
                 normal_tex = sampler_sid
         """
+        
         self.writel(S_FX, 3, "<technique sid=\"common\">")
         shtype = "blinn"
         self.writel(S_FX, 4, "<{}>".format(shtype))
@@ -291,7 +345,7 @@ class DaeExporter:
         else:
             # TODO: More accurate coloring, if possible     
             self.writel(S_FX, 6, "<color>{}</color>".format(
-                numarr_alpha(material.diffuse_color, 1.0)))#material.emit is removed in Blender 2.8
+                numarr_alpha(material.diffuse_color, 1.0)))#material.emit is removed in Blender 2.8             
         self.writel(S_FX, 5, "</emission>")
 
         self.writel(S_FX, 5, "<ambient>")
@@ -421,19 +475,23 @@ class DaeExporter:
                     armature_modifier_state = armature_modifier.show_viewport
                     armature_modifier.show_viewport = False         
                 
-                v = node.to_mesh(bpy.context.depsgraph, True, calc_undeformed=False) 
+                print(node)
+                v = node.to_mesh(preserve_all_data_layers=True, depsgraph=bpy.context.evaluated_depsgraph_get()) 
+                print(v)
                 # Warning, Blender 2.8 does not support anymore the "RENDER" argument to apply modifier
                 # with render state only...
                 
                 armature_modifier.show_viewport = armature_modifier_state
                 
                 self.temp_meshes.add(v)
-                node.data = v
-                node.data.update()
+                deps = bpy.context.evaluated_depsgraph_get()
+                evaluated_node = node.evaluated_get(deps)
+                evaluated_node.data = v
+                evaluated_node.data.update()
                 if (armature and k == 0):                   
-                    md = self.export_mesh(node, armature, k, mid, shape.name)
+                    md = self.export_mesh(evaluated_node, armature, k, mid, shape.name)
                 else:                   
-                    md = self.export_mesh(node, None, k, None, shape.name)
+                    md = self.export_mesh(evaluated_node, None, k, None, shape.name)
 
                 node.data = p
                 node.data.update()
@@ -538,7 +596,9 @@ class DaeExporter:
         
         if(self.config["use_exclude_armature_modifier"]):
             armature_modifiers = [i for i in node.modifiers if i.type == "ARMATURE"]
-            armature_modifier = armature_modifiers[0]#node.modifiers.get("Armature")
+            if len(armature_modifiers) > 0:
+                print(node.name)            
+                armature_modifier = armature_modifiers[0]#node.modifiers.get("Armature")
 
         # Set armature in rest pose
         if(armature_modifier):  
@@ -557,7 +617,7 @@ class DaeExporter:
         if (custom_name is not None and custom_name != ""):
             name_to_use = custom_name
 
-        mesh = node.to_mesh(bpy.context.depsgraph, apply_modifiers, calc_undeformed=False) 
+        mesh = node.to_mesh(preserve_all_data_layers=False, depsgraph=bpy.context.evaluated_depsgraph_get()) 
         # 2.8 update: warning, Blender does not support anymore the "RENDER" argument to apply modifier
         # with render state, only current state
         
@@ -627,7 +687,7 @@ class DaeExporter:
                 
                 if (mat is not None):               
                     materials[f.material_index] = self.export_material(
-                        mat, mesh.show_double_sided)
+                        mat, True)#True = deprecated mesh.show_double_sided value, which is removed from Blender 2.8
                 else:
                     materials[f.material_index] = None
 
@@ -1842,8 +1902,7 @@ class DaeExporter:
                 if (self.config["use_anim_skip_noexp"] and
                         x.name.endswith("-noexp")):
                     continue
-                
-                                
+                           
                 bones = []
                 # Find bones used
                 for p in x.fcurves:
@@ -1998,9 +2057,11 @@ class DaeExporter:
         return self
 
     def __exit__(self, *exc):
+        pass
+        """    
         for mesh in self.temp_meshes:
             bpy.data.meshes.remove(mesh)
-
+        """
 
 def save(operator, context, filepath="", use_selection=False, **kwargs):
     with DaeExporter(filepath, kwargs, operator) as exp:
