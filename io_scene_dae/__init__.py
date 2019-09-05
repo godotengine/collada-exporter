@@ -22,6 +22,7 @@ from bpy_extras.io_utils import ExportHelper
 bl_info = {
     "name": "Better Collada Exporter",
     "author": "Juan Linietsky, artell",
+    "version": (1, 10, 11),
     "blender": (2, 80, 0),
     "api": 38691,
     "location": "File > Import-Export",
@@ -136,7 +137,7 @@ class CE_OT_export_dae(bpy.types.Operator, ExportHelper):
         description="Export shape keys for selected objects.",
         default=False,
         )
-        
+		
     anim_optimize_precision : FloatProperty(
         name="Precision",
         description=("Tolerence for comparing double keyframes "
@@ -175,24 +176,24 @@ class CE_OT_export_dae(bpy.types.Operator, ExportHelper):
 def menu_func(self, context):
     self.layout.operator(CE_OT_export_dae.bl_idname, text="Better Collada (.dae)")
 
-    
+	
 #classes = (CE_OT_export_dae)
 
-def register():  
-    from bpy.utils import register_class
+def register():	 
+	from bpy.utils import register_class
 
-    register_class(CE_OT_export_dae)
-    
-    #bpy.types.INFO_MT_file_export.append(menu_func)
-    bpy.types.TOPBAR_MT_file_export.append(menu_func)
+	register_class(CE_OT_export_dae)
+	
+	#bpy.types.INFO_MT_file_export.append(menu_func)
+	bpy.types.TOPBAR_MT_file_export.append(menu_func)
 
-def unregister():    
-    from bpy.utils import unregister_class
-    
-    unregister_class(CE_OT_export_dae)
-    
-    #bpy.types.INFO_MT_file_export.append(menu_func)
-    bpy.types.TOPBAR_MT_file_export.remove(menu_func)
+def unregister():	 
+	from bpy.utils import unregister_class
+	
+	unregister_class(CE_OT_export_dae)
+	
+	#bpy.types.INFO_MT_file_export.append(menu_func)
+	bpy.types.TOPBAR_MT_file_export.remove(menu_func)
 
 if __name__ == "__main__":
     register()
