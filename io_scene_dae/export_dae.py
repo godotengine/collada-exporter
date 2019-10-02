@@ -596,6 +596,9 @@ class DaeExporter:
                     mat = mesh.materials[f.material_index]
                 except:
                     mat = None
+                    
+                if mat is None:
+                    mat = node.active_material
 
                 if (mat is not None):
                     materials[f.material_index] = self.export_material(
