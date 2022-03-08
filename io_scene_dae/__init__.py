@@ -21,9 +21,9 @@ from bpy.props import StringProperty, BoolProperty, FloatProperty, EnumProperty
 from bpy_extras.io_utils import ExportHelper
 bl_info = {
     "name": "Better Collada Exporter",
-    "author": "Juan Linietsky, artell",
+    "author": "Juan Linietsky, artell, Panthavma",
     "version": (1, 10, 11),
-    "blender": (2, 80, 0),
+    "blender": (3, 0, 1),
     "api": 38691,
     "location": "File > Import-Export",
     "description": ("Export DAE Scenes. This plugin actually works better! "
