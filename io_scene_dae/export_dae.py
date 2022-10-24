@@ -1370,7 +1370,8 @@ class DaeExporter:
         self.writel(
             S_GEOM, 1, "<geometry id=\"{}\" name=\"{}\">".format(
                 splineid, curve.name))
-        self.writel(S_GEOM, 2, "<spline closed=\"0\">")
+        self.writel(S_GEOM, 2, "<spline closed=\"{}\">".format(
+                "true" if curve.splines and curve.splines[0].use_cyclic_u else "false"))
 
         points = []
         interps = []
