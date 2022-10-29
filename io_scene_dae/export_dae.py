@@ -431,6 +431,19 @@ class DaeExporter:
         self.writel(S_MATS, 1, "<material id=\"{}\" name=\"{}\">".format(
             matid, material.name))
         self.writel(S_MATS, 2, "<instance_effect url=\"#{}\"/>".format(fxid))
+
+        # Export custom properties
+        if len(material.keys()) > 1:
+            self.writel(S_MATS, 2, "<extra>")
+            self.writel(S_MATS, 3, "<technique profile=\"blender\">")
+            self.writel(S_MATS, 4, "<custom_properties>")
+            for K in material.keys():
+                if K not in '_RNA_UI':
+                    self.writel(S_MATS, 5, "<param name=\"{}\" type=\"string\">{}".format(K, material[K]) + "</param>")
+            self.writel(S_MATS, 4, "</custom_properties>")
+            self.writel(S_MATS, 3, "</technique>")
+            self.writel(S_MATS, 2, "</extra>")
+
         self.writel(S_MATS, 1, "</material>")
 
         self.material_cache[material] = matid
@@ -764,6 +777,19 @@ class DaeExporter:
         self.writel(
             S_GEOM, 1, "<geometry id=\"{}\" name=\"{}\">".format(
                 meshid, name_to_use))
+
+
+        # Export custom properties
+        if len(node.keys()) > 1:
+            self.writel(S_GEOM, 2, "<extra>")
+            self.writel(S_GEOM, 3, "<technique profile=\"blender\">")
+            self.writel(S_GEOM, 4, "<custom_properties>")
+            for K in node.keys():
+                if K not in '_RNA_UI':
+                    self.writel(S_GEOM, 5, "<param name=\"{}\" type=\"string\">{}".format(K, node[K]) + "</param>")
+            self.writel(S_GEOM, 4, "</custom_properties>")
+            self.writel(S_GEOM, 3, "</technique>")
+            self.writel(S_GEOM, 2, "</extra>")
 
         self.writel(S_GEOM, 2, "<mesh>")
 
