@@ -681,8 +681,8 @@ class DaeExporter:
                 surface_indices[f.material_index] = []
 
                 try:
-                    # TODO: Review, understand why it throws
-                    mat = mesh.materials[f.material_index]
+                    # Throws if the mesh has no materials, ignore it
+                    mat = node.material_slots[f.material_index].material
                 except:
                     mat = None
                 
