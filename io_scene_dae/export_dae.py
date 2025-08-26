@@ -1751,7 +1751,7 @@ class DaeExporter:
 
         return [anim_id]
 
-    def export_animation(self, start, end, allowed=None):
+    def export_animation(self, start, end, allowed=None, bones=None):
         # TODO: Blender -> Collada frames needs a little work
         #       Collada starts from 0, blender usually from 1.
         #       The last frame must be included also
@@ -1820,11 +1820,14 @@ class DaeExporter:
                     xform_cache[name].append((key, mtx))
 
                 if (node.type == "ARMATURE"):
-                    # All bones exported for now
                     for bone in node.data.bones:
                         if((bone.name.startswith("ctrl") or
                             bone.use_deform == False) and
                                 self.config["use_exclude_ctrl_bones"]):
+                            continue
+
+                        # Skip if bone was not keyed
+                        if bones is not None and bone.name not in bones:
                             continue
 
                         bone_name = self.skeleton_info[node]["bone_ids"][bone]
@@ -1931,7 +1934,7 @@ class DaeExporter:
                             bone.matrix_basis = Matrix()
 
                 tcn = self.export_animation(int(x.frame_range[0]), int(
-                    x.frame_range[1] + 0.5), allowed_skeletons)
+                    x.frame_range[1] + 0.5), allowed_skeletons, bones)
                 framelen = (1.0 / self.scene.render.fps)
                 start = x.frame_range[0] * framelen
                 end = x.frame_range[1] * framelen
